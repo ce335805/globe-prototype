@@ -50,6 +50,9 @@ export default {
       this.renderer.render(this.scene, this.camera);
     },
     drawCircles: function() {
+      let geometryCircle = new Three.CircleGeometry( 0.005, 5);
+      let materialCircle = new Three.MeshBasicMaterial({color: 0xffffff});
+
       for (let lat = -90; lat <=90; lat += 180/this.rows){
         const radius = Math.cos(Math.abs(lat) * DEG2RAD);
         const circumference = radius * Math.PI * 2;
@@ -62,50 +65,40 @@ export default {
           if (!this.visibilityForCoordinate(long, lat)){
             continue;
           }
-          let geometryCircle = new Three.CircleGeometry( 0.005, 5);
-          let materialCircle = new Three.MeshBasicMaterial({color: 0xffffff});
           let circle = new Three.Mesh(geometryCircle, materialCircle);
           this.scene.add(circle);
           let xCoord = Math.sin(long * DEG2RAD) * Math.cos(lat * DEG2RAD) * 1.001;
           let yCoord = Math.sin(lat * DEG2RAD) * 1.001;
           let zCoord = Math.cos(long * DEG2RAD) * Math.cos(lat * DEG2RAD) * 1.001;
           circle.position.set(xCoord, yCoord, zCoord);
-          //circle.rotation.x = Math.PI / 4.;
         }
       }
     },
     loadWorldMap: function(){
       //let ctx = document.createElement('canvas').getContext('2d');
-      let ctx = document.getElementById('drawWorldMap').getContext('2d');
+      let cnvs = document.getElementById('drawWorldMap')
+      let ctx = cnvs.getContext('2d');
       let img = new Image();
       let vm = this;
       img.onload = function() {
         console.log('image loaded');
+        cnvs.width = img.width;
+        cnvs.height = img.height;
         ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
         vm.imgData = ctx.getImageData(0, 0, img.width, img.height);
         vm.imgWidth = img.width;
         vm.imgHeight = img.height;
         console.log(img.width);
         console.log(img.height);
-        //console.log(vm.imgData.data);
-        //draw globe once image is loaded
         vm.drawCircles();
       };
       img.src = require("../assets/worldmap.png");
+
     },
     visibilityForCoordinate: function(long, lat) {
       const pixelRow = Math.floor(this.imgHeight/100 * (-lat + 50));
       const pixelColumn = Math.floor(this.imgWidth/360 * ((long + 90) % 360));
-      //console.log(pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3);
-      if(this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 0){
-      //if(this.imgData.data[pixelColumn * this.imgWidth * 4 + pixelRow * 4 + 3] > 0){
-        //console.log(this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3]);
-        return true;
-      } else {
-        //console.log(this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3]);
-        return false;
-      }
-      //return (lat > 0 && long > 30);
+      return this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 0;
     }
   },
   mounted() {
@@ -124,8 +117,8 @@ export default {
 }
 
 #drawWorldMap{
-  height: 324px;
-  width: 601px;
+  height: 300px;
+  width: 600px;
 }
 
 </style>
