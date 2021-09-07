@@ -21,8 +21,8 @@ export default {
       controls: null,
       globe: null,
       testCircle: null,
-      rows: 160,
-      dotDensity: 80,
+      rows: 280,
+      dotDensity: 140,
       imgData: null,
       imgWidth: 0,
       imgHeight: 0,
@@ -40,9 +40,9 @@ export default {
       this.scene = new Three.Scene();
 
       let geometry = new Three.SphereGeometry( 1, 64, 64 );
-      let material = new Three.MeshBasicMaterial({color: 0x3251a6});
+      let material = new Three.MeshBasicMaterial({color: 0x3251a6, opacity: 0.5, transparent: true});
       this.globe = new Three.Mesh(geometry, material);
-      //this.scene.add(this.globe);
+      this.scene.add(this.globe);
 
       //some stuff for performance optimization
       let pixelRatio = window.devicePixelRatio
@@ -79,12 +79,18 @@ export default {
           if (!this.visibilityForCoordinate(long, lat) || (lat < -60 || lat > 60)){
             continue;
           }
-          let xCoord = Math.sin(long * DEG2RAD) * Math.cos(lat * DEG2RAD) * 1.001;
-          let yCoord = Math.sin(lat * DEG2RAD) * 1.001;
-          let zCoord = Math.cos(long * DEG2RAD) * Math.cos(lat * DEG2RAD) * 1.001;
-          const m = new Three.Matrix4();
-          m.makeTranslation(xCoord, yCoord, zCoord);
           let geometryCircle = new Three.CircleBufferGeometry( 0.005, 3);
+          const xCoord = Math.sin(long * DEG2RAD) * Math.cos(lat * DEG2RAD) * 1.001;
+          const yCoord = Math.sin(lat * DEG2RAD) * 1.001;
+          const zCoord = Math.cos(long * DEG2RAD) * Math.cos(lat * DEG2RAD) * 1.001;
+          const m = new Three.Matrix4();
+          const vecX = new Three.Vector3( 1, 0, 0 );
+          m.makeRotationAxis(vecX, lat * DEG2RAD);
+          geometryCircle.applyMatrix4(m);
+          const vecY = new Three.Vector3( 0, 1, 0 );
+          m.makeRotationAxis(vecY, long * DEG2RAD);
+          geometryCircle.applyMatrix4(m);
+          m.makeTranslation(xCoord, yCoord, zCoord);
           geometryCircle.applyMatrix4(m);
           geometries.push(geometryCircle);
         }
@@ -117,7 +123,7 @@ export default {
     visibilityForCoordinate: function(long, lat) {
       const pixelRow = Math.floor(this.imgHeight/120 * (-lat + 60));
       const pixelColumn = Math.floor(this.imgWidth/360 * ((long + 180) % 360));
-      return this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 30;
+      return this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 120;
     }
   },
   mounted() {
