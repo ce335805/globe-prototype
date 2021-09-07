@@ -21,13 +21,13 @@ export default {
       controls: null,
       globe: null,
       testCircle: null,
-      rows: 280,
-      dotDensity: 140,
+      rows: 200,
+      dotDensity: 100,
       imgData: null,
       imgWidth: 0,
       imgHeight: 0,
       circleArr: null,
-      singleCircle: null
+      landMesh: null
     }
   },
   methods: {
@@ -58,7 +58,7 @@ export default {
       container.appendChild(this.renderer.domElement);
 
       this.controls = new OrbitControls( this.camera, this.renderer.domElement );
-      this.controls.autoRotate = true;
+      //this.controls.autoRotate = true;
       this.controls.update();
 
     },
@@ -66,6 +66,10 @@ export default {
       requestAnimationFrame(this.animate);
       this.controls.update();
       //this.singleCircle.position.x += 0.1;
+      const m = new Three.Matrix4();
+      const vecY = new Three.Vector3( 0, 1, 0 );
+      m.makeRotationAxis(vecY, 0.1 * DEG2RAD);
+      this.landMesh.applyMatrix4(m);
       this.renderer.render(this.scene, this.camera);
     },
     drawCircles: function() {
@@ -85,7 +89,7 @@ export default {
           const zCoord = Math.cos(long * DEG2RAD) * Math.cos(lat * DEG2RAD) * 1.001;
           const m = new Three.Matrix4();
           const vecX = new Three.Vector3( 1, 0, 0 );
-          m.makeRotationAxis(vecX, lat * DEG2RAD);
+          m.makeRotationAxis(vecX, -lat * DEG2RAD);
           geometryCircle.applyMatrix4(m);
           const vecY = new Three.Vector3( 0, 1, 0 );
           m.makeRotationAxis(vecY, long * DEG2RAD);
@@ -98,10 +102,10 @@ export default {
       const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
       const materialCircle = new Three.MeshBasicMaterial({color: 0xffffff});
       materialCircle.side = Three.DoubleSide;
-      const mesh = new Three.Mesh(mergedGeometry, materialCircle);
-      this.scene.add(mesh);
-
+      this.landMesh = new Three.Mesh(mergedGeometry, materialCircle);
+      this.scene.add(this.landMesh);
     },
+
     loadWorldMap: function(){
       let cnvs = document.createElement('canvas')
       let ctx = cnvs.getContext('2d');
