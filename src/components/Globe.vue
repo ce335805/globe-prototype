@@ -138,8 +138,8 @@ export default {
     drawArch: function () {
       this.myArch = new archClass(this.testCurveCoordinates1, this.testCurveCoordinates2);
       const curve = this.myArch.makeCurve();
-      this.curveGeometry = new Three.TubeBufferGeometry(curve, 50, 0.0025, 4, false);
-      const material = new Three.MeshBasicMaterial({color: 0x00ff00});
+      this.curveGeometry = new Three.TubeBufferGeometry(curve, 50, 0.0035, 4, false);
+      const material = new Three.MeshBasicMaterial({color: 0xffc97b});
       this.curveMesh = new Three.Mesh(this.curveGeometry, material);
 
       this.scene.add(this.curveMesh);
