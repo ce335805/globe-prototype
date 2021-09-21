@@ -10,7 +10,7 @@ import * as Three from 'three'
 import {DEG2RAD} from "three/src/math/MathUtils";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
-import {CubicBezierCurve3} from "three";
+import archClass from "@/classes/arch";
 
 export default {
   name: 'globe',
@@ -37,6 +37,7 @@ export default {
       curveRangeStart: 0,
       curveRangeStop: 0,
       archExpanding: true,
+      myArch: null
     }
   },
   //threex.domevents - use for mouse-hover
@@ -54,12 +55,6 @@ export default {
       this.globe = new Three.Mesh(geometry, material);
       this.scene.add(this.globe);
 
-      //some stuff for performance optimization
-      //let pixelRatio = window.devicePixelRatio
-      //let AA = true
-      //if (pixelRatio > 1) {
-      //  AA = false
-      //}
       this.renderer = new Three.WebGLRenderer({
         antialias: true,
         powerPreference: "high-performance",
@@ -68,7 +63,6 @@ export default {
       container.appendChild(this.renderer.domElement);
 
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-      //this.controls.autoRotate = true;
       this.controls.update();
 
     },
@@ -142,30 +136,13 @@ export default {
       return this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 120;
     },
     drawArch: function () {
-      const curve = this.makeCurve();
+      this.myArch = new archClass(this.testCurveCoordinates1, this.testCurveCoordinates2);
+      const curve = this.myArch.makeCurve();
       this.curveGeometry = new Three.TubeBufferGeometry(curve, 50, 0.0025, 4, false);
       const material = new Three.MeshBasicMaterial({color: 0x00ff00});
       this.curveMesh = new Three.Mesh(this.curveGeometry, material);
 
       this.scene.add(this.curveMesh);
-    },
-    makeCurve: function () {
-      const startLocation = this.degToPointOnSpere(this.testCurveCoordinates1[0], this.testCurveCoordinates1[1]);
-      const endLocation = this.degToPointOnSpere(this.testCurveCoordinates2[0], this.testCurveCoordinates2[1]);
-      let ctrl1 = this.calculatePointOnConnection(0.4, new Three.Vector3(startLocation.x, startLocation.y, startLocation.z), new Three.Vector3(endLocation.x, endLocation.y, endLocation.z));
-      let ctrl2 = this.calculatePointOnConnection(0.6, new Three.Vector3(startLocation.x, startLocation.y, startLocation.z), new Three.Vector3(endLocation.x, endLocation.y, endLocation.z));
-
-      const m = new Three.Matrix4();
-      m.makeScale(1.6, 1.6, 1.6);
-      ctrl1.applyMatrix4(m);
-      ctrl2.applyMatrix4(m);
-      return new CubicBezierCurve3(startLocation, ctrl1, ctrl2, endLocation);
-    },
-    degToPointOnSpere: function (lat, long) {
-      const xCoord = Math.sin(long) * Math.cos(lat);
-      const yCoord = Math.sin(lat);
-      const zCoord = Math.cos(long) * Math.cos(lat);
-      return new Three.Vector3(xCoord, yCoord, zCoord);
     },
     archRangeTick: function () {
       //let count = this.curveGeometry.attributes.position.count;
@@ -181,67 +158,6 @@ export default {
         this.curveRangeStart = 0;
         this.curveRangeStop = 0;
       }
-    },
-    calculatePointOnConnection: function (fractionInBetween, pointA, pointB) {
-      console.log(pointA.x);
-      console.log(pointA.x);
-      const angleY = -Math.atan(pointA.x / pointB.z);
-      const mY = new Three.Matrix4();
-      const vecY = new Three.Vector3(0, 1, 0);
-      mY.makeRotationAxis(vecY, angleY);
-
-      pointA.applyMatrix4(mY);
-      pointB.applyMatrix4(mY);
-      //this.drawPoint(pointA, 1);
-      //this.drawPoint(pointB, 1);
-      const angleX = Math.atan(pointA.y / pointA.z);
-      const mX = new Three.Matrix4();
-      const vecX = new Three.Vector3(1, 0, 0);
-      mX.makeRotationAxis(vecX, angleX);
-      pointA.applyMatrix4(mX);
-      pointB.applyMatrix4(mX);
-      const angleZ = Math.atan(pointB.x / pointB.y);
-      const mZ = new Three.Matrix4();
-      const vecZ = new Three.Vector3(0, 0, 1);
-      mZ.makeRotationAxis(vecZ, angleZ);
-      pointA.applyMatrix4(mZ);
-      pointB.applyMatrix4(mZ);
-      //this.drawPoint(pointA, 2);
-      //this.drawPoint(pointB, 2);
-
-      //let pointTest = new Three.Vector3(0., 0., 1.);
-      //this.drawPoint(pointTest, 2);
-
-
-      const theta = fractionInBetween * Math.atan(pointB.y / pointB.z);
-      let connectionPoint = new Three.Vector3(0., Math.sin(theta), Math.cos(theta));
-
-      const mYInv = new Three.Matrix4();
-      mYInv.makeRotationAxis(vecY, -angleY);
-      const mXInv = new Three.Matrix4();
-      mXInv.makeRotationAxis(vecX, -angleX);
-      const mZInv = new Three.Matrix4();
-      mZInv.makeRotationAxis(vecZ, -angleZ);
-
-      connectionPoint.applyMatrix4(mZInv);
-      connectionPoint.applyMatrix4(mXInv);
-      connectionPoint.applyMatrix4(mYInv);
-
-      return connectionPoint;
-    },
-    drawPoint: function (point, flavour) {
-      let materialCircle = null;
-      if (flavour === 1) {
-        materialCircle = new Three.MeshBasicMaterial({color: 0x77ff11});
-      } else {
-        materialCircle = new Three.MeshBasicMaterial({color: 0xff9922});
-      }
-      const m = new Three.Matrix4();
-      m.makeTranslation(point.x, point.y, point.z);
-      let geometryCircle = new Three.CircleBufferGeometry(0.01, 5);
-      geometryCircle.applyMatrix4(m);
-      const pointMesh = new Three.Mesh(geometryCircle, materialCircle);
-      this.scene.add(pointMesh);
     }
   },
   mounted() {
