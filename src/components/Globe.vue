@@ -30,14 +30,8 @@ export default {
       imgHeight: 0,
       circleArr: null,
       landMesh: null,
-      testCurveCoordinates1: [0.9326, 0.1740],
-      testCurveCoordinates2: [0.0593, 0.5936],
-      curveGeometry: null,
-      curveMesh: null,
-      curveRangeStart: 0,
-      curveRangeStop: 0,
-      archExpanding: true,
-      myArch: null
+      coordinatesArches: [[[0.9326, 0.1740], [0.0593, 0.5936]]],
+      arches: []
     }
   },
   //threex.domevents - use for mouse-hover
@@ -73,9 +67,8 @@ export default {
       const vecY = new Three.Vector3(0, 1, 0);
       m.makeRotationAxis(vecY, 0.05 * DEG2RAD);
       this.landMesh.applyMatrix4(m);
-      this.curveMesh.applyMatrix4(m);
-      this.archRangeTick();
-      this.curveGeometry.setDrawRange(this.curveRangeStart, this.curveRangeStop - this.curveRangeStart);
+      this.arches[0].curveMesh.applyMatrix4(m);
+      this.arches[0].archRangeTick();
       this.renderer.render(this.scene, this.camera);
     },
     drawCircles: function () {
@@ -136,35 +129,14 @@ export default {
       return this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 120;
     },
     drawArch: function () {
-      this.myArch = new archClass(this.testCurveCoordinates1, this.testCurveCoordinates2);
-      const curve = this.myArch.makeCurve();
-      this.curveGeometry = new Three.TubeBufferGeometry(curve, 50, 0.0035, 4, false);
-      const material = new Three.MeshBasicMaterial({color: 0xffc97b});
-      this.curveMesh = new Three.Mesh(this.curveGeometry, material);
-
-      this.scene.add(this.curveMesh);
+      this.arches = [new archClass(this.coordinatesArches[0][0], this.coordinatesArches[0][1])];
+      this.scene.add(this.arches[0].curveMesh);
     },
-    archRangeTick: function () {
-      //let count = this.curveGeometry.attributes.position.count;
-      let count = 1200;
-      if (this.curveRangeStop - this.curveRangeStart < 2 * count && this.archExpanding) {
-        this.curveRangeStop += 10;
-      } else if (this.curveRangeStop - this.curveRangeStart >= 2 * count && this.archExpanding) {
-        this.archExpanding = false;
-      } else if (this.curveRangeStop - this.curveRangeStart > 0 && !this.archExpanding) {
-        this.curveRangeStart += 10;
-      } else {
-        this.archExpanding = true;
-        this.curveRangeStart = 0;
-        this.curveRangeStop = 0;
-      }
-    }
   },
   mounted() {
     this.init();
     this.loadWorldMap();
     this.drawArch();
-    //this.drawTwoPointsAndOneInTheMiddle();
     this.animate();
   }
 }

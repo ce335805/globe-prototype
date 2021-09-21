@@ -4,11 +4,16 @@ import {CubicBezierCurve3} from "three";
 export default class archClass {
     startPoint = null;
     endPoint = null;
+    curveGeometry = null;
+    curveMesh = null;
+    curveRangeStart = 0;
+    curveRangeStop = 0;
+    archExpanding = true;
 
-    constructor(latLongStart, latLongEnd)
-    {
+    constructor(latLongStart, latLongEnd) {
         this.startPoint = this.degToPointOnSpere(latLongStart[0], latLongStart[1]);
         this.endPoint = this.degToPointOnSpere(latLongEnd[0], latLongEnd[1]);
+        this.initializeMesh();
     }
 
     degToPointOnSpere(lat, long) {
@@ -18,7 +23,7 @@ export default class archClass {
         return new Three.Vector3(xCoord, yCoord, zCoord);
     }
 
-    calculatePointOnConnection (fractionInBetween, pointA, pointB) {
+    calculatePointOnConnection(fractionInBetween, pointA, pointB) {
         console.log(pointA.x);
         console.log(pointA.x);
         const angleY = -Math.atan(pointA.x / pointB.z);
@@ -68,4 +73,27 @@ export default class archClass {
         return new CubicBezierCurve3(this.startPoint, ctrl1, ctrl2, this.endPoint);
     }
 
+    initializeMesh() {
+        const curve = this.makeCurve();
+        this.curveGeometry = new Three.TubeBufferGeometry(curve, 50, 0.0035, 4, false);
+        const material = new Three.MeshBasicMaterial({color: 0xffc97b});
+        this.curveMesh = new Three.Mesh(this.curveGeometry, material);
+    }
+
+    archRangeTick() {
+        //let count = this.curveGeometry.attributes.position.count;
+        let count = 1200;
+        if (this.curveRangeStop - this.curveRangeStart < 2 * count && this.archExpanding) {
+            this.curveRangeStop += 10;
+        } else if (this.curveRangeStop - this.curveRangeStart >= 2 * count && this.archExpanding) {
+            this.archExpanding = false;
+        } else if (this.curveRangeStop - this.curveRangeStart > 0 && !this.archExpanding) {
+            this.curveRangeStart += 10;
+        } else {
+            this.archExpanding = true;
+            this.curveRangeStart = 0;
+            this.curveRangeStop = 0;
+        }
+        this.curveGeometry.setDrawRange(this.curveRangeStart, this.curveRangeStop - this.curveRangeStart);
+    }
 }
