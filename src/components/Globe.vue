@@ -63,12 +63,13 @@ export default {
     animate: function () {
       requestAnimationFrame(this.animate);
       this.controls.update();
-      const m = new Three.Matrix4();
-      const vecY = new Three.Vector3(0, 1, 0);
-      m.makeRotationAxis(vecY, 0.05 * DEG2RAD);
-      this.landMesh.applyMatrix4(m);
-      this.arches[0].curveMesh.applyMatrix4(m);
-      this.arches[0].archRangeTick();
+      //const m = new Three.Matrix4();
+      //const vecY = new Three.Vector3(0, 1, 0);
+      //m.makeRotationAxis(vecY, 0.05 * DEG2RAD);
+      //this.landMesh.applyMatrix4(m);
+      //this.arches[0].curveMesh.applyMatrix4(m);
+      //this.arches[0].archRangeTick();
+
       this.renderer.render(this.scene, this.camera);
     },
     drawCircles: function () {
@@ -119,6 +120,14 @@ export default {
         vm.imgWidth = img.width;
         vm.imgHeight = img.height;
         vm.drawCircles();
+        //rotate globe to nice position
+        const m = new Three.Matrix4();
+        const vecY = new Three.Vector3(0, 1, 0);
+        m.makeRotationAxis(vecY, -37 * DEG2RAD);
+        vm.landMesh.applyMatrix4(m);
+        const vecX = new Three.Vector3(1, 0, 0);
+        m.makeRotationAxis(vecX, 20 * DEG2RAD);
+        vm.landMesh.applyMatrix4(m);
       };
       img.src = require("../assets/worldmap2.png");
 
@@ -132,11 +141,28 @@ export default {
       this.arches = [new archClass(this.coordinatesArches[0][0], this.coordinatesArches[0][1])];
       this.scene.add(this.arches[0].curveMesh);
     },
+    rotateArches: function() {
+      const m = new Three.Matrix4();
+      const vecY = new Three.Vector3(0, 1, 0);
+      m.makeRotationAxis(vecY, -37 * DEG2RAD);
+
+      for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
+        this.arches[archInd].curveMesh.applyMatrix4(m);
+      }
+
+      const vecX = new Three.Vector3(1, 0, 0);
+      m.makeRotationAxis(vecX, 20 * DEG2RAD);
+      for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
+        this.arches[archInd].curveMesh.applyMatrix4(m);
+      }
+
+    },
   },
   mounted() {
     this.init();
     this.loadWorldMap();
     this.drawArch();
+    this.rotateArches();
     this.animate();
   }
 }
