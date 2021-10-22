@@ -2,6 +2,18 @@
   <div>
     <div id="container"></div>
     <canvas id="drawWorldMap"></canvas>
+    <project-card>
+      <div id = "project0" style="display: none; padding: 10px;">This is project 0!</div>
+      <div id = "project1" style="display: none; padding: 10px;">This is project 1!</div>
+      <div id = "project2" style="display: none; padding: 10px;">This is project 2!</div>
+      <div id = "project3" style="display: none; padding: 10px;">This is project 3!</div>
+      <div id = "project4" style="display: none; padding: 10px;">This is project 4!</div>
+      <div id = "project5" style="display: none; padding: 10px;">This is project 5!</div>
+      <div id = "project6" style="display: none; padding: 10px;">This is project 6!</div>
+      <div id = "project7" style="display: none; padding: 10px;">This is project 7!</div>
+      <div id = "project8" style="display: none; padding: 10px;">This is project 8!</div>
+      <div id = "project9" style="display: none; padding: 10px;">This is project 9!</div>
+  </project-card>
   </div>
 </template>
 
@@ -11,9 +23,11 @@ import {DEG2RAD} from "three/src/math/MathUtils";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
 import archClass from "@/classes/arch";
+import ProjectCard from "@/components/projectCard";
 
 export default {
   name: 'globe',
+  components: {ProjectCard},
   data() {
     return {
       container: null,
@@ -46,6 +60,7 @@ export default {
       arches: [],
       mouse: new Three.Vector2(),
       INTERSECTED: null,
+      intersectedIndex: 1,
       containerRect: null,
       archesGroup: null
     }
@@ -75,8 +90,6 @@ export default {
 
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       this.controls.update();
-
-
     },
     animate: function () {
       requestAnimationFrame(this.animate);
@@ -87,8 +100,6 @@ export default {
       //this.landMesh.applyMatrix4(m);
       //this.arches[0].curveMesh.applyMatrix4(m);
       //this.arches[0].archRangeTick();
-
-      console.log(this.mouse.x);
 
       this.update();
       this.renderer.render(this.scene, this.camera);
@@ -106,17 +117,26 @@ export default {
 
       if (intersects.length > 0) {
         // if the closest object intersected is not the currently stored intersection object
-        if (intersects[0].object != this.INTERSECTED) {
+        if (intersects[0].object !== this.INTERSECTED) {
           // restore previous intersection object (if it exists) to its original color
-          if (this.INTERSECTED)
+          if (this.INTERSECTED) {
             this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
+            document.getElementById("project" + this.intersectedIndex).style.display = "none";
+          }
           // store reference to closest object as current intersection object
           this.INTERSECTED = intersects[0].object;
           // store color of closest object (for later restoration)
           this.INTERSECTED.currentHex = this.INTERSECTED.material.color.getHex();
           // set a new color for closest object
           this.INTERSECTED.material.color.setHex(0xffffff);
+
+          for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
+              if(this.INTERSECTED === this.arches[archInd].curveMesh){
+                this.intersectedIndex = archInd;
+              }
+          }
           document.body.style.cursor = 'pointer';
+          document.getElementById("project" + this.intersectedIndex).style.display = "block";
         }
       } else // there are no intersections
       {
@@ -126,6 +146,7 @@ export default {
         // remove previous intersection object reference
         //     by setting current intersection object to "nothing"
         this.INTERSECTED = null;
+        document.getElementById("project" + this.intersectedIndex).style.display = "none";
         document.body.style.cursor = 'auto';
       }
 
@@ -173,7 +194,7 @@ export default {
       let img = new Image();
       let vm = this;
       img.onload = function () {
-        console.log('image loaded');
+        //console.log('image loaded');
         cnvs.width = img.width;
         cnvs.height = img.height;
         ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
