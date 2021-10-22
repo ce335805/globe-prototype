@@ -16,6 +16,7 @@ export default {
   name: 'globe',
   data() {
     return {
+      container: null,
       drawnLatDegs: 180,
       camera: null,
       scene: null,
@@ -30,15 +31,31 @@ export default {
       imgHeight: 0,
       circleArr: null,
       landMesh: null,
-      coordinatesArches: [[[0.9326, 0.1740], [0.0593, 0.5936]]],
-      arches: []
+      coordinatesArches: [
+        [[0.9326, 0.1740], [0.0593, 0.5936]],
+        [[0.9326, 0.1740], [26.6 * DEG2RAD, 86.8 * DEG2RAD]],//Nepal
+        [[0.9326, 0.1740], [23.4 * DEG2RAD, 78.8 * DEG2RAD]],//India
+        [[0.9326, 0.1740], [0.9 * DEG2RAD, 37.3 * DEG2RAD]],//Kenya
+        [[0.9326, 0.1740], [8.9 * DEG2RAD, 37.2 * DEG2RAD]],//Ethopia, Ijaji
+        [[0.9326, 0.1740], [-18.8 * DEG2RAD, 30.0 * DEG2RAD]],//Zimbabwe
+        [[0.9326, 0.1740], [8.9 * DEG2RAD, -11.7 * DEG2RAD]],//Sierra Leone
+        [[0.9326, 0.1740], [17.8 * DEG2RAD, 34.9 * DEG2RAD]],//Mozambique
+        [[0.9326, 0.1740], [13.7 * DEG2RAD, 26.4 * DEG2RAD]],//Zambia
+        [[0.9326, 0.1740], [10.6 * DEG2RAD, 38.0 * DEG2RAD]]//Ethiopia
+      ],
+      arches: [],
+      mouse: new Three.Vector2(),
+      INTERSECTED: null,
+      containerRect: null,
+      archesGroup: null
     }
   },
   //threex.domevents - use for mouse-hover
   methods: {
     init: function () {
       let container = document.getElementById('container');
-
+      this.containerRect = container.getBoundingClientRect();
+      this.container = container;
       this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.005, 10);
       this.camera.position.z = 2.4;
 
@@ -59,6 +76,7 @@ export default {
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       this.controls.update();
 
+
     },
     animate: function () {
       requestAnimationFrame(this.animate);
@@ -70,7 +88,49 @@ export default {
       //this.arches[0].curveMesh.applyMatrix4(m);
       //this.arches[0].archRangeTick();
 
+      console.log(this.mouse.x);
+
+      this.update();
       this.renderer.render(this.scene, this.camera);
+    },
+    onMouseMove: function (event) {
+      this.mouse.x = ((event.clientX - this.containerRect.left) / this.container.clientWidth) * 2 - 1;
+      this.mouse.y = -((event.clientY - this.containerRect.top) / this.container.clientHeight) * 2 + 1;
+    },
+    update: function () {
+      var vector = new Three.Vector3(this.mouse.x, this.mouse.y, 1.);
+      vector.unproject(this.camera);
+      var ray = new Three.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
+
+      var intersects = ray.intersectObjects(this.archesGroup.children);
+
+      if (intersects.length > 0) {
+        // if the closest object intersected is not the currently stored intersection object
+        if (intersects[0].object != this.INTERSECTED) {
+          // restore previous intersection object (if it exists) to its original color
+          if (this.INTERSECTED)
+            this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
+          // store reference to closest object as current intersection object
+          this.INTERSECTED = intersects[0].object;
+          // store color of closest object (for later restoration)
+          this.INTERSECTED.currentHex = this.INTERSECTED.material.color.getHex();
+          // set a new color for closest object
+          this.INTERSECTED.material.color.setHex(0xffffff);
+          document.body.style.cursor = 'pointer';
+        }
+      } else // there are no intersections
+      {
+        // restore previous intersection object (if it exists) to its original color
+        if (this.INTERSECTED)
+          this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
+        // remove previous intersection object reference
+        //     by setting current intersection object to "nothing"
+        this.INTERSECTED = null;
+        document.body.style.cursor = 'auto';
+      }
+
+      this.controls.update();
+      //this.stats.update();
     },
     drawCircles: function () {
       let geometries = [];
@@ -104,7 +164,8 @@ export default {
       materialCircle.side = Three.DoubleSide;
       this.landMesh = new Three.Mesh(mergedGeometry, materialCircle);
       this.scene.add(this.landMesh);
-    },
+    }
+    ,
 
     loadWorldMap: function () {
       let cnvs = document.createElement('canvas')
@@ -131,17 +192,36 @@ export default {
       };
       img.src = require("../assets/worldmap2.png");
 
-    },
+    }
+    ,
     visibilityForCoordinate: function (long, lat) {
       const pixelRow = Math.floor(this.imgHeight / this.drawnLatDegs * (-lat + this.drawnLatDegs / 2));
       const pixelColumn = Math.floor(this.imgWidth / 360 * ((long + 180) % 360));
       return this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 120;
-    },
+    }
+    ,
     drawArch: function () {
-      this.arches = [new archClass(this.coordinatesArches[0][0], this.coordinatesArches[0][1])];
-      this.scene.add(this.arches[0].curveMesh);
-    },
-    rotateArches: function() {
+      this.arches = [
+        new archClass(this.coordinatesArches[0][0], this.coordinatesArches[0][1]),
+        new archClass(this.coordinatesArches[1][0], this.coordinatesArches[1][1]),
+        new archClass(this.coordinatesArches[2][0], this.coordinatesArches[2][1]),
+        new archClass(this.coordinatesArches[3][0], this.coordinatesArches[3][1]),
+        new archClass(this.coordinatesArches[4][0], this.coordinatesArches[4][1]),
+        new archClass(this.coordinatesArches[5][0], this.coordinatesArches[5][1]),
+        new archClass(this.coordinatesArches[6][0], this.coordinatesArches[6][1]),
+        new archClass(this.coordinatesArches[7][0], this.coordinatesArches[7][1]),
+        new archClass(this.coordinatesArches[8][0], this.coordinatesArches[8][1]),
+        new archClass(this.coordinatesArches[9][0], this.coordinatesArches[9][1])
+      ];
+      this.archesGroup = new Three.Group();
+      for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
+        //this.scene.add(this.arches[archInd].curveMesh);
+        this.archesGroup.add(this.arches[archInd].curveMesh);
+      }
+      this.scene.add(this.archesGroup);
+    }
+    ,
+    rotateArches: function () {
       const m = new Three.Matrix4();
       const vecY = new Three.Vector3(0, 1, 0);
       m.makeRotationAxis(vecY, -37 * DEG2RAD);
@@ -156,10 +236,12 @@ export default {
         this.arches[archInd].curveMesh.applyMatrix4(m);
       }
 
-    },
+    }
+    ,
   },
   mounted() {
     this.init();
+    window.addEventListener( 'mousemove', this.onMouseMove, false );
     this.loadWorldMap();
     this.drawArch();
     this.rotateArches();

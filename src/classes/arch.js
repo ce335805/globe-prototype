@@ -24,8 +24,6 @@ export default class archClass {
     }
 
     calculatePointOnConnection(fractionInBetween, pointA, pointB) {
-        console.log(pointA.x);
-        console.log(pointA.x);
         const angleY = -Math.atan(pointA.x / pointB.z);
         const mY = new Three.Matrix4();
         const vecY = new Three.Vector3(0, 1, 0);
