@@ -1,19 +1,46 @@
 <template>
   <div>
     <div id="container"></div>
-    <canvas id="drawWorldMap"></canvas>
-    <project-card>
-      <div id = "project0" style="display: none; padding: 10px;">This is project 0!</div>
-      <div id = "project1" style="display: none; padding: 10px;">This is project 1!</div>
-      <div id = "project2" style="display: none; padding: 10px;">This is project 2!</div>
-      <div id = "project3" style="display: none; padding: 10px;">This is project 3!</div>
-      <div id = "project4" style="display: none; padding: 10px;">This is project 4!</div>
-      <div id = "project5" style="display: none; padding: 10px;">This is project 5!</div>
-      <div id = "project6" style="display: none; padding: 10px;">This is project 6!</div>
-      <div id = "project7" style="display: none; padding: 10px;">This is project 7!</div>
-      <div id = "project8" style="display: none; padding: 10px;">This is project 8!</div>
-      <div id = "project9" style="display: none; padding: 10px;">This is project 9!</div>
-  </project-card>
+
+    <project-card id="project0">
+      <div>This is project 0!</div>
+    </project-card>
+
+    <project-card id="project1">
+      <div>This is project 1!</div>
+    </project-card>
+
+    <project-card id="project2">
+      <div>This is project 2!</div>
+    </project-card>
+
+    <project-card id="project3">
+      <div>This is project 3!</div>
+    </project-card>
+
+    <project-card id="project4">
+      <div>This is project 4!</div>
+    </project-card>
+
+    <project-card id="project5">
+      <div>This is project 5!</div>
+    </project-card>
+
+    <project-card id="project6">
+      <div>This is project 6!</div>
+    </project-card>
+
+    <project-card id="project7">
+      <div>This is project 7!</div>
+    </project-card>
+
+    <project-card id="project8">
+      <div>This is project 8!</div>
+    </project-card>
+
+    <project-card id="project9">
+      <div>This is project 9!</div>
+    </project-card>
   </div>
 </template>
 
@@ -37,13 +64,11 @@ export default {
       renderer: null,
       controls: null,
       globe: null,
-      testCircle: null,
       rows: 120,
       dotDensity: 60,
       imgData: null,
       imgWidth: 0,
       imgHeight: 0,
-      circleArr: null,
       landMesh: null,
       coordinatesArches: [
         [[0.9326, 0.1740], [0.0593, 0.5936]],
@@ -58,14 +83,13 @@ export default {
         [[0.9326, 0.1740], [10.6 * DEG2RAD, 38.0 * DEG2RAD]]//Ethiopia
       ],
       arches: [],
+      archesGroup: null,
       mouse: new Three.Vector2(),
       INTERSECTED: null,
       intersectedIndex: 1,
       containerRect: null,
-      archesGroup: null
     }
   },
-  //threex.domevents - use for mouse-hover
   methods: {
     init: function () {
       let container = document.getElementById('container');
@@ -81,10 +105,7 @@ export default {
       this.globe = new Three.Mesh(geometry, material);
       this.scene.add(this.globe);
 
-      this.renderer = new Three.WebGLRenderer({
-        antialias: true,
-        powerPreference: "high-performance",
-      });
+      this.renderer = new Three.WebGLRenderer({antialias: true, powerPreference: "high-performance"});
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(this.renderer.domElement);
 
@@ -94,13 +115,6 @@ export default {
     animate: function () {
       requestAnimationFrame(this.animate);
       this.controls.update();
-      //const m = new Three.Matrix4();
-      //const vecY = new Three.Vector3(0, 1, 0);
-      //m.makeRotationAxis(vecY, 0.05 * DEG2RAD);
-      //this.landMesh.applyMatrix4(m);
-      //this.arches[0].curveMesh.applyMatrix4(m);
-      //this.arches[0].archRangeTick();
-
       this.update();
       this.renderer.render(this.scene, this.camera);
     },
@@ -116,42 +130,32 @@ export default {
       var intersects = ray.intersectObjects(this.archesGroup.children);
 
       if (intersects.length > 0) {
-        // if the closest object intersected is not the currently stored intersection object
         if (intersects[0].object !== this.INTERSECTED) {
-          // restore previous intersection object (if it exists) to its original color
           if (this.INTERSECTED) {
             this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
             document.getElementById("project" + this.intersectedIndex).style.display = "none";
           }
-          // store reference to closest object as current intersection object
           this.INTERSECTED = intersects[0].object;
-          // store color of closest object (for later restoration)
           this.INTERSECTED.currentHex = this.INTERSECTED.material.color.getHex();
-          // set a new color for closest object
           this.INTERSECTED.material.color.setHex(0xffffff);
 
           for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-              if(this.INTERSECTED === this.arches[archInd].curveMesh){
-                this.intersectedIndex = archInd;
-              }
+            if (this.INTERSECTED === this.arches[archInd].curveMesh) {
+              this.intersectedIndex = archInd;
+            }
           }
+          console.log("project" + this.intersectedIndex);
           document.body.style.cursor = 'pointer';
           document.getElementById("project" + this.intersectedIndex).style.display = "block";
         }
-      } else // there are no intersections
-      {
-        // restore previous intersection object (if it exists) to its original color
+      } else {
         if (this.INTERSECTED)
           this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
-        // remove previous intersection object reference
-        //     by setting current intersection object to "nothing"
         this.INTERSECTED = null;
         document.getElementById("project" + this.intersectedIndex).style.display = "none";
         document.body.style.cursor = 'auto';
       }
-
       this.controls.update();
-      //this.stats.update();
     },
     drawCircles: function () {
       let geometries = [];
@@ -185,9 +189,7 @@ export default {
       materialCircle.side = Three.DoubleSide;
       this.landMesh = new Three.Mesh(mergedGeometry, materialCircle);
       this.scene.add(this.landMesh);
-    }
-    ,
-
+    },
     loadWorldMap: function () {
       let cnvs = document.createElement('canvas')
       let ctx = cnvs.getContext('2d');
@@ -213,14 +215,12 @@ export default {
       };
       img.src = require("../assets/worldmap2.png");
 
-    }
-    ,
+    },
     visibilityForCoordinate: function (long, lat) {
       const pixelRow = Math.floor(this.imgHeight / this.drawnLatDegs * (-lat + this.drawnLatDegs / 2));
       const pixelColumn = Math.floor(this.imgWidth / 360 * ((long + 180) % 360));
       return this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 120;
-    }
-    ,
+    },
     drawArch: function () {
       this.arches = [
         new archClass(this.coordinatesArches[0][0], this.coordinatesArches[0][1]),
@@ -240,8 +240,7 @@ export default {
         this.archesGroup.add(this.arches[archInd].curveMesh);
       }
       this.scene.add(this.archesGroup);
-    }
-    ,
+    },
     rotateArches: function () {
       const m = new Three.Matrix4();
       const vecY = new Three.Vector3(0, 1, 0);
@@ -257,12 +256,11 @@ export default {
         this.arches[archInd].curveMesh.applyMatrix4(m);
       }
 
-    }
-    ,
+    },
   },
   mounted() {
     this.init();
-    window.addEventListener( 'mousemove', this.onMouseMove, false );
+    window.addEventListener('mousemove', this.onMouseMove, false);
     this.loadWorldMap();
     this.drawArch();
     this.rotateArches();
@@ -274,13 +272,9 @@ export default {
 <style scoped>
 
 #container {
+  float:left;
   height: 800px;
   width: 800px;
-}
-
-#drawWorldMap {
-  height: 300px;
-  width: 600px;
 }
 
 </style>
