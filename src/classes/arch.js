@@ -9,11 +9,13 @@ export default class archClass {
     curveRangeStart = 0;
     curveRangeStop = 0;
     archExpanding = true;
+    onLandDistance = 0;
 
     constructor(latLongStart, latLongEnd) {
         this.startPoint = this.degToPointOnSpere(latLongStart[0], latLongStart[1]);
         this.endPoint = this.degToPointOnSpere(latLongEnd[0], latLongEnd[1]);
         this.initializeMesh();
+        this.calculateOnLandDistance(this.startPoint, this.endPoint);
     }
 
     degToPointOnSpere(lat, long) {
@@ -93,5 +95,30 @@ export default class archClass {
             this.curveRangeStop = 0;
         }
         this.curveGeometry.setDrawRange(this.curveRangeStart, this.curveRangeStop - this.curveRangeStart);
+    }
+
+    calculateOnLandDistance(pointA, pointB) {
+        const angleY = -Math.atan(pointA.x / pointB.z);
+        const mY = new Three.Matrix4();
+        const vecY = new Three.Vector3(0, 1, 0);
+        mY.makeRotationAxis(vecY, angleY);
+
+        pointA.applyMatrix4(mY);
+        pointB.applyMatrix4(mY);
+        const angleX = Math.atan(pointA.y / pointA.z);
+        const mX = new Three.Matrix4();
+        const vecX = new Three.Vector3(1, 0, 0);
+        mX.makeRotationAxis(vecX, angleX);
+        pointA.applyMatrix4(mX);
+        pointB.applyMatrix4(mX);
+        const angleZ = Math.atan(pointB.x / pointB.y);
+        const mZ = new Three.Matrix4();
+        const vecZ = new Three.Vector3(0, 0, 1);
+        mZ.makeRotationAxis(vecZ, angleZ);
+        pointA.applyMatrix4(mZ);
+        pointB.applyMatrix4(mZ);
+
+        const theta = Math.atan(pointB.y / pointB.z);
+        this.onLandDistance = -theta * 6365;
     }
 }

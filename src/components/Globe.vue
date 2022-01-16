@@ -2,43 +2,43 @@
   <div>
     <div id="container"></div>
 
-    <project-card id="project0">
+    <project-card id="project0" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[0]">
       <div>This is project 0!</div>
     </project-card>
 
-    <project-card id="project1">
+    <project-card id="project1" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[1]">
       <div>This is project 1!</div>
     </project-card>
 
-    <project-card id="project2">
+    <project-card id="project2" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[2]">
       <div>This is project 2!</div>
     </project-card>
 
-    <project-card id="project3">
+    <project-card id="project3" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[3]">
       <div>This is project 3!</div>
     </project-card>
 
-    <project-card id="project4">
+    <project-card id="project4" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[4]">
       <div>This is project 4!</div>
     </project-card>
 
-    <project-card id="project5">
+    <project-card id="project5" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[5]">
       <div>This is project 5!</div>
     </project-card>
 
-    <project-card id="project6">
+    <project-card id="project6" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[6]">
       <div>This is project 6!</div>
     </project-card>
 
-    <project-card id="project7">
+    <project-card id="project7" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[7]">
       <div>This is project 7!</div>
     </project-card>
 
-    <project-card id="project8">
+    <project-card id="project8" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[8]">
       <div>This is project 8!</div>
     </project-card>
 
-    <project-card id="project9">
+    <project-card id="project9" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[9]">
       <div>This is project 9!</div>
     </project-card>
   </div>
@@ -88,6 +88,8 @@ export default {
       INTERSECTED: null,
       intersectedIndex: 1,
       containerRect: null,
+      kmRun: 2871,
+      distances: [],
     }
   },
   methods: {
@@ -144,7 +146,6 @@ export default {
               this.intersectedIndex = archInd;
             }
           }
-          console.log("project" + this.intersectedIndex);
           document.body.style.cursor = 'pointer';
           document.getElementById("project" + this.intersectedIndex).style.display = "block";
         }
@@ -255,7 +256,13 @@ export default {
       for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
         this.arches[archInd].curveMesh.applyMatrix4(m);
       }
+    },
+    fillDistances: function () {
+      for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
+        this.distances.push(this.arches[archInd].onLandDistance);
 
+        console.log(this.distances[archInd]);
+      }
     },
   },
   mounted() {
@@ -264,6 +271,7 @@ export default {
     this.loadWorldMap();
     this.drawArch();
     this.rotateArches();
+    this.fillDistances();
     this.animate();
   }
 }
