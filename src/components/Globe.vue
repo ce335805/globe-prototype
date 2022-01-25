@@ -52,6 +52,9 @@ import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils"
 import archClass from "@/classes/arch";
 import ProjectCard from "@/components/projectCard";
 
+import vertexShader from 'raw-loader!glslify-loader!../assets/shaders/vertex.glsl'
+import fragmentShader from 'raw-loader!glslify-loader!../assets/shaders/fragment.glsl'
+
 export default {
   name: 'globe',
   components: {ProjectCard},
@@ -64,8 +67,8 @@ export default {
       renderer: null,
       controls: null,
       globe: null,
-      rows: 120,
-      dotDensity: 60,
+      rows: 160,
+      dotDensity: 80,
       imgData: null,
       imgWidth: 0,
       imgHeight: 0,
@@ -103,9 +106,25 @@ export default {
       this.scene = new Three.Scene();
 
       let geometry = new Three.SphereGeometry(1, 64, 64);
-      let material = new Three.MeshBasicMaterial({color: 0x3251a6, opacity: 0.7, transparent: true});
+      //let material = new Three.MeshPhongMaterial({color: 0x3A93C0, opacity: 1., transparent: true});
+      let material = new Three.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        lights: false
+      });
       this.globe = new Three.Mesh(geometry, material);
       this.scene.add(this.globe);
+
+      const ambientLight = new Three.AmbientLight( 0xffffff , 0.3);
+      this.scene.add( ambientLight );
+
+      const directionalLight1 = new Three.DirectionalLight( 0xffffff, 1.0 );
+      directionalLight1.position.set(-1, 1, 0.4);
+      this.scene.add( directionalLight1 );
+
+      const directionalLight2 = new Three.DirectionalLight( 0xffffff, 5.0 );
+      directionalLight2.position.set(-1, 1, -2.);
+      this.scene.add( directionalLight2 );
 
       this.renderer = new Three.WebGLRenderer({antialias: true, powerPreference: "high-performance"});
       this.renderer.setSize(container.clientWidth, container.clientHeight);
@@ -115,9 +134,9 @@ export default {
       this.controls.update();
     },
     animate: function () {
-      requestAnimationFrame(this.animate);
-      this.controls.update();
-      this.update();
+      //requestAnimationFrame(this.animate);
+      //this.controls.update();
+      //this.update();
       this.renderer.render(this.scene, this.camera);
     },
     onMouseMove: function (event) {
@@ -208,7 +227,7 @@ export default {
         //rotate globe to nice position
         const m = new Three.Matrix4();
         const vecY = new Three.Vector3(0, 1, 0);
-        m.makeRotationAxis(vecY, -37 * DEG2RAD);
+        m.makeRotationAxis(vecY, -25 * DEG2RAD);
         vm.landMesh.applyMatrix4(m);
         const vecX = new Three.Vector3(1, 0, 0);
         m.makeRotationAxis(vecX, 20 * DEG2RAD);
@@ -245,7 +264,7 @@ export default {
     rotateArches: function () {
       const m = new Three.Matrix4();
       const vecY = new Three.Vector3(0, 1, 0);
-      m.makeRotationAxis(vecY, -37 * DEG2RAD);
+      m.makeRotationAxis(vecY, -25 * DEG2RAD);
 
       for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
         this.arches[archInd].curveMesh.applyMatrix4(m);
@@ -267,11 +286,11 @@ export default {
   },
   mounted() {
     this.init();
-    window.addEventListener('mousemove', this.onMouseMove, false);
-    this.loadWorldMap();
-    this.drawArch();
-    this.rotateArches();
-    this.fillDistances();
+    //window.addEventListener('mousemove', this.onMouseMove, false);
+    //this.loadWorldMap();
+    //this.drawArch();
+    //this.rotateArches();
+    //this.fillDistances();
     this.animate();
   }
 }
