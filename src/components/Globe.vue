@@ -106,25 +106,51 @@ export default {
       this.scene = new Three.Scene();
 
       let geometry = new Three.SphereGeometry(1, 64, 64);
-      //let material = new Three.MeshPhongMaterial({color: 0x3A93C0, opacity: 1., transparent: true});
-      let material = new Three.ShaderMaterial({
+      let material = new Three.MeshPhongMaterial({
+        color: 0x3A93C0,
+        opacity: 1.,
+        transparent: true,
+        shininess: 5.
+      });
+
+      let geometryAtmosphere = new Three.SphereGeometry(1.15, 64, 64);
+      let materialAtmosphere = new Three.ShaderMaterial({
         vertexShader,
         fragmentShader,
-        lights: false
+        blending: Three.AdditiveBlending,
+        side: Three.BackSide
       });
       this.globe = new Three.Mesh(geometry, material);
+      let athmosphere = new Three.Mesh(geometryAtmosphere, materialAtmosphere)
       this.scene.add(this.globe);
+      this.scene.add(athmosphere);
 
-      const ambientLight = new Three.AmbientLight( 0xffffff , 0.3);
-      this.scene.add( ambientLight );
+      const ambientLight = new Three.AmbientLight(0xffffff, 0.3);
+      this.scene.add(ambientLight);
 
-      const directionalLight1 = new Three.DirectionalLight( 0xffffff, 1.0 );
-      directionalLight1.position.set(-1, 1, 0.4);
-      this.scene.add( directionalLight1 );
+      const directionalLight1 = new Three.DirectionalLight(0xffffff, 0.7);
+      directionalLight1.position.set(-1, 1, .8);
+      this.scene.add(directionalLight1);
 
-      const directionalLight2 = new Three.DirectionalLight( 0xffffff, 5.0 );
-      directionalLight2.position.set(-1, 1, -2.);
-      this.scene.add( directionalLight2 );
+      //const directionalLight2 = new Three.DirectionalLight(0xffffff, 0.2);
+      //directionalLight2.position.set(-1, 1.5, 0.3);
+      //this.scene.add(directionalLight2);
+//
+      //const directionalLight3 = new Three.DirectionalLight(0xffffff, 0.2);
+      //directionalLight3.position.set(-1, 0.5, 0.3);
+      //this.scene.add(directionalLight3);
+//
+      //const directionalLight4 = new Three.DirectionalLight(0xffffff, 0.2);
+      //directionalLight4.position.set(-1, 1, 0.3);
+      //this.scene.add(directionalLight4);
+
+      const directionalLight5 = new Three.DirectionalLight(0xffffff, 1.0);
+      directionalLight5.position.set(-1, 1, -2.);
+      this.scene.add(directionalLight5);
+
+      //const pointLight = new Three.PointLight( 0xffffff, 4, 100 );
+      //pointLight.position.set( -50, 50, 20 );
+      //this.scene.add( pointLight );
 
       this.renderer = new Three.WebGLRenderer({antialias: true, powerPreference: "high-performance"});
       this.renderer.setSize(container.clientWidth, container.clientHeight);
@@ -134,9 +160,9 @@ export default {
       this.controls.update();
     },
     animate: function () {
-      //requestAnimationFrame(this.animate);
-      //this.controls.update();
-      //this.update();
+      requestAnimationFrame(this.animate);
+      this.controls.update();
+      this.update();
       this.renderer.render(this.scene, this.camera);
     },
     onMouseMove: function (event) {
@@ -286,11 +312,11 @@ export default {
   },
   mounted() {
     this.init();
-    //window.addEventListener('mousemove', this.onMouseMove, false);
-    //this.loadWorldMap();
-    //this.drawArch();
-    //this.rotateArches();
-    //this.fillDistances();
+    window.addEventListener('mousemove', this.onMouseMove, false);
+    this.loadWorldMap();
+    this.drawArch();
+    this.rotateArches();
+    this.fillDistances();
     this.animate();
   }
 }
@@ -299,7 +325,7 @@ export default {
 <style scoped>
 
 #container {
-  float:left;
+  float: left;
   height: 800px;
   width: 800px;
 }
