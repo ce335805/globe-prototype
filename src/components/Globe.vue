@@ -47,7 +47,7 @@
 <script>
 import * as Three from 'three'
 import {DEG2RAD} from "three/src/math/MathUtils";
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+//import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
 import archClass from "@/classes/arch";
 import ProjectCard from "@/components/projectCard";
@@ -65,7 +65,7 @@ export default {
       camera: null,
       scene: null,
       renderer: null,
-      controls: null,
+      //controls: null,
       globe: null,
       rows: 160,
       dotDensity: 80,
@@ -113,7 +113,7 @@ export default {
         shininess: 5.
       });
 
-      let geometryAtmosphere = new Three.SphereGeometry(1.15, 64, 64);
+      let geometryAtmosphere = new Three.SphereGeometry(1.1, 64, 64);
       let materialAtmosphere = new Three.ShaderMaterial({
         vertexShader,
         fragmentShader,
@@ -128,40 +128,39 @@ export default {
       const ambientLight = new Three.AmbientLight(0xffffff, 0.3);
       this.scene.add(ambientLight);
 
-      const directionalLight1 = new Three.DirectionalLight(0xffffff, 0.7);
+      const directionalLight1 = new Three.DirectionalLight(0xffffff, 0.3);
       directionalLight1.position.set(-1, 1, .8);
       this.scene.add(directionalLight1);
 
-      //const directionalLight2 = new Three.DirectionalLight(0xffffff, 0.2);
-      //directionalLight2.position.set(-1, 1.5, 0.3);
-      //this.scene.add(directionalLight2);
-//
-      //const directionalLight3 = new Three.DirectionalLight(0xffffff, 0.2);
-      //directionalLight3.position.set(-1, 0.5, 0.3);
-      //this.scene.add(directionalLight3);
-//
-      //const directionalLight4 = new Three.DirectionalLight(0xffffff, 0.2);
-      //directionalLight4.position.set(-1, 1, 0.3);
-      //this.scene.add(directionalLight4);
+      const directionalLight2 = new Three.DirectionalLight(0xffffff, 0.3);
+      directionalLight2.position.set(-1, .5, 1.5);
+      this.scene.add(directionalLight2);
+
+      const directionalLight3 = new Three.DirectionalLight(0xffffff, 0.3);
+      directionalLight3.position.set(-1, 1.5, 1.5);
+      this.scene.add(directionalLight3);
 
       const directionalLight5 = new Three.DirectionalLight(0xffffff, 1.0);
       directionalLight5.position.set(-1, 1, -2.);
       this.scene.add(directionalLight5);
 
-      //const pointLight = new Three.PointLight( 0xffffff, 4, 100 );
-      //pointLight.position.set( -50, 50, 20 );
-      //this.scene.add( pointLight );
-
-      this.renderer = new Three.WebGLRenderer({antialias: true, powerPreference: "high-performance"});
+      this.renderer = new Three.WebGLRenderer({
+        antialias: true,
+        powerPreference: "high-performance",
+        alpha: true
+      });
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(this.renderer.domElement);
 
-      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-      this.controls.update();
+      this.renderer.setClearColor( 0xffffff, 0);
+      //this.scene.background = new Three.Color(0xffffff);
+
+      //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      //this.controls.update();
     },
     animate: function () {
       requestAnimationFrame(this.animate);
-      this.controls.update();
+      //this.controls.update();
       this.update();
       this.renderer.render(this.scene, this.camera);
     },
@@ -184,7 +183,7 @@ export default {
           }
           this.INTERSECTED = intersects[0].object;
           this.INTERSECTED.currentHex = this.INTERSECTED.material.color.getHex();
-          this.INTERSECTED.material.color.setHex(0xffffff);
+          this.INTERSECTED.material.color.setHex(0xffab36);
 
           for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
             if (this.INTERSECTED === this.arches[archInd].curveMesh) {
@@ -201,7 +200,7 @@ export default {
         document.getElementById("project" + this.intersectedIndex).style.display = "none";
         document.body.style.cursor = 'auto';
       }
-      this.controls.update();
+      //this.controls.update();
     },
     drawCircles: function () {
       let geometries = [];
