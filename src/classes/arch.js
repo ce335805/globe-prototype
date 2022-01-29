@@ -6,9 +6,8 @@ export default class archClass {
     endPoint = null;
     curveGeometry = null;
     curveMesh = null;
-    curveRangeStart = 0;
-    curveRangeStop = 0;
-    archExpanding = true;
+    tubeGeometry = null;
+    tubeMesh = null;
     onLandDistance = 0;
 
     constructor(latLongStart, latLongEnd) {
@@ -75,26 +74,18 @@ export default class archClass {
 
     initializeMesh() {
         const curve = this.makeCurve();
+
         this.curveGeometry = new Three.TubeBufferGeometry(curve, 50, 0.0035, 4, false);
         const material = new Three.MeshBasicMaterial({color: 0xffc97b});
         this.curveMesh = new Three.Mesh(this.curveGeometry, material);
-    }
 
-    archRangeTick() {
-        //let count = this.curveGeometry.attributes.position.count;
-        let count = 1200;
-        if (this.curveRangeStop - this.curveRangeStart < 2 * count && this.archExpanding) {
-            this.curveRangeStop += 10;
-        } else if (this.curveRangeStop - this.curveRangeStart >= 2 * count && this.archExpanding) {
-            this.archExpanding = false;
-        } else if (this.curveRangeStop - this.curveRangeStart > 0 && !this.archExpanding) {
-            this.curveRangeStart += 10;
-        } else {
-            this.archExpanding = true;
-            this.curveRangeStart = 0;
-            this.curveRangeStop = 0;
-        }
-        this.curveGeometry.setDrawRange(this.curveRangeStart, this.curveRangeStop - this.curveRangeStart);
+        this.tubeGeometry = new Three.TubeBufferGeometry(curve, 50, 0.015, 4, false);
+        const tubeMaterial = new Three.MeshBasicMaterial({
+            color: 0xffc97b,
+            transparent: true,
+            opacity: 0.0
+        });
+        this.tubeMesh = new Three.Mesh(this.tubeGeometry, tubeMaterial);
     }
 
     calculateOnLandDistance(pointA, pointB) {

@@ -15,8 +15,7 @@ export default {
   props: ['kmRun', 'kmDistance'],
   data() {
     return {
-      //mouse: new Three.Vector2(),
-      //htmlElement: null
+      allCards: null
     }
   },
   computed: {
@@ -26,26 +25,26 @@ export default {
     }
   },
   methods: {
-    //onMouseMove: function (event) {
-    //  this.htmlElement.style.left = event.clientX + 20 + 'px';
-    //  this.htmlElement.style.top = event.clientY + 20 + 'px';
-    //},
+    onMouseMove: function (event) {
+      for (let ind = 0; ind < this.allCards.length; ind++) {
+        this.allCards[ind].style.left = event.clientX + 20 + 'px';
+        this.allCards[ind].style.top = event.clientY + 20 + 'px';
+      }
+    },
   },
   mounted() {
-    //const progressNumeric = this.kmRun / this.kmDistance * 100;
-    //console.log(progressNumeric);
-    //this.progressFraction = progressNumeric.toString() + "%";
-    //console.log(this.progressFraction);
-    //this.htmlElement = document.getElementById('projectCard');
-    //window.addEventListener('mousemove', this.onMouseMove, false);
+    const progressNumeric = this.kmRun / this.kmDistance * 100;
+    this.progressFraction = progressNumeric.toString() + "%";
+    this.allCards = document.getElementsByClassName('projectCard');
+    window.addEventListener('mousemove', this.onMouseMove, false);
   }
 }
 </script>
 
 <style scoped>
 .projectCard{
+  position: absolute;
   display: none;
-  float:left;
   width: 400px;
 
   padding: 20px;

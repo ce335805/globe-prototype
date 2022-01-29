@@ -87,6 +87,7 @@ export default {
       ],
       arches: [],
       archesGroup: null,
+      tubesGroup: null,
       mouse: new Three.Vector2(),
       INTERSECTED: null,
       intersectedIndex: 1,
@@ -140,9 +141,13 @@ export default {
       directionalLight3.position.set(-1, 1.5, 1.5);
       this.scene.add(directionalLight3);
 
-      const directionalLight5 = new Three.DirectionalLight(0xffffff, 1.0);
-      directionalLight5.position.set(-1, 1, -2.);
+      const directionalLight5 = new Three.DirectionalLight(0xffffff, .8);
+      directionalLight5.position.set(-1, 1., -1.5);
       this.scene.add(directionalLight5);
+
+      const directionalLight6 = new Three.DirectionalLight(0xffffff, 1.25);
+      directionalLight6.position.set(-1, 0.3, -1.2);
+      this.scene.add(directionalLight6);
 
       this.renderer = new Three.WebGLRenderer({
         antialias: true,
@@ -173,20 +178,22 @@ export default {
       vector.unproject(this.camera);
       var ray = new Three.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
 
-      var intersects = ray.intersectObjects(this.archesGroup.children);
+      var intersects = ray.intersectObjects(this.tubesGroup.children);
 
       if (intersects.length > 0) {
         if (intersects[0].object !== this.INTERSECTED) {
           if (this.INTERSECTED) {
-            this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
+            //this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
+            this.INTERSECTED.material.opacity = 0.;
             document.getElementById("project" + this.intersectedIndex).style.display = "none";
           }
           this.INTERSECTED = intersects[0].object;
-          this.INTERSECTED.currentHex = this.INTERSECTED.material.color.getHex();
-          this.INTERSECTED.material.color.setHex(0xffab36);
+          //this.INTERSECTED.currentHex = this.INTERSECTED.material.color.getHex();
+          //this.INTERSECTED.material.color.setHex(0xffab36);
+          this.INTERSECTED.material.opacity = 0.2;
 
           for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-            if (this.INTERSECTED === this.arches[archInd].curveMesh) {
+            if (this.INTERSECTED === this.arches[archInd].tubeMesh) {
               this.intersectedIndex = archInd;
             }
           }
@@ -195,7 +202,8 @@ export default {
         }
       } else {
         if (this.INTERSECTED)
-          this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
+          this.INTERSECTED.material.opacity = 0.;
+          //this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
         this.INTERSECTED = null;
         document.getElementById("project" + this.intersectedIndex).style.display = "none";
         document.body.style.cursor = 'auto';
@@ -280,11 +288,14 @@ export default {
         new archClass(this.coordinatesArches[9][0], this.coordinatesArches[9][1])
       ];
       this.archesGroup = new Three.Group();
+      this.tubesGroup = new Three.Group();
       for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
         //this.scene.add(this.arches[archInd].curveMesh);
         this.archesGroup.add(this.arches[archInd].curveMesh);
+        this.tubesGroup.add(this.arches[archInd].tubeMesh);
       }
       this.scene.add(this.archesGroup);
+      this.scene.add(this.tubesGroup);
     },
     rotateArches: function () {
       const m = new Three.Matrix4();
@@ -293,12 +304,14 @@ export default {
 
       for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
         this.arches[archInd].curveMesh.applyMatrix4(m);
+        this.arches[archInd].tubeMesh.applyMatrix4(m);
       }
 
       const vecX = new Three.Vector3(1, 0, 0);
       m.makeRotationAxis(vecX, 20 * DEG2RAD);
       for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
         this.arches[archInd].curveMesh.applyMatrix4(m);
+        this.arches[archInd].tubeMesh.applyMatrix4(m);
       }
     },
     fillDistances: function () {
