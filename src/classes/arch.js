@@ -75,7 +75,7 @@ export default class archClass {
     initializeMesh() {
         const curve = this.makeCurve();
 
-        this.curveGeometry = new Three.TubeBufferGeometry(curve, 50, 0.0035, 4, false);
+        this.curveGeometry = new Three.TubeBufferGeometry(curve, 50, 0.0025, 4, false);
         const material = new Three.MeshBasicMaterial({color: 0xffc97b});
         this.curveMesh = new Three.Mesh(this.curveGeometry, material);
 

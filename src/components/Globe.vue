@@ -150,7 +150,7 @@ export default {
       this.scene.add(directionalLight6);
 
       this.renderer = new Three.WebGLRenderer({
-        antialias: true,
+        antialias: false,
         powerPreference: "high-performance",
         alpha: true
       });
@@ -180,17 +180,18 @@ export default {
 
       var intersects = ray.intersectObjects(this.tubesGroup.children);
 
+      const color0 = 0xffc97b;
+      const colorHovered = 0xf57b42;
+
       if (intersects.length > 0) {
         if (intersects[0].object !== this.INTERSECTED) {
           if (this.INTERSECTED) {
-            //this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
             this.INTERSECTED.material.opacity = 0.;
             document.getElementById("project" + this.intersectedIndex).style.display = "none";
+            this.arches[this.intersectedIndex].curveMesh.material.color.setHex(color0);
           }
           this.INTERSECTED = intersects[0].object;
-          //this.INTERSECTED.currentHex = this.INTERSECTED.material.color.getHex();
-          //this.INTERSECTED.material.color.setHex(0xffab36);
-          this.INTERSECTED.material.opacity = 0.2;
+          this.INTERSECTED.material.opacity = 0.15;
 
           for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
             if (this.INTERSECTED === this.arches[archInd].tubeMesh) {
@@ -199,13 +200,14 @@ export default {
           }
           document.body.style.cursor = 'pointer';
           document.getElementById("project" + this.intersectedIndex).style.display = "block";
+          this.arches[this.intersectedIndex].curveMesh.material.color.setHex(colorHovered);
         }
       } else {
         if (this.INTERSECTED)
           this.INTERSECTED.material.opacity = 0.;
-          //this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
         this.INTERSECTED = null;
         document.getElementById("project" + this.intersectedIndex).style.display = "none";
+        this.arches[this.intersectedIndex].curveMesh.material.color.setHex(color0);
         document.body.style.cursor = 'auto';
       }
       //this.controls.update();
@@ -221,7 +223,7 @@ export default {
           if (!this.visibilityForCoordinate(long, lat)) {
             continue;
           }
-          let geometryCircle = new Three.CircleBufferGeometry(0.004, 5);
+          let geometryCircle = new Three.CircleBufferGeometry(0.005, 5);
           const xCoord = Math.sin(long * DEG2RAD) * Math.cos(lat * DEG2RAD) * 1.001;
           const yCoord = Math.sin(lat * DEG2RAD) * 1.001;
           const zCoord = Math.cos(long * DEG2RAD) * Math.cos(lat * DEG2RAD) * 1.001;
