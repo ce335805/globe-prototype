@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import globe from './components/Globe.vue'
+import globe from './components/globe/Globe.vue'
 
 export default {
   name: 'App',

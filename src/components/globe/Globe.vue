@@ -52,8 +52,10 @@ import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils"
 import archClass from "@/classes/arch";
 import ProjectCard from "@/components/projectCard";
 
-import vertexShader from 'raw-loader!glslify-loader!../assets/shaders/vertex.glsl'
-import fragmentShader from 'raw-loader!glslify-loader!../assets/shaders/fragment.glsl'
+import vertexShader from 'raw-loader!glslify-loader!../../assets/shaders/vertex.glsl'
+import fragmentShader from 'raw-loader!glslify-loader!../../assets/shaders/fragment.glsl'
+
+var archFunc = require('./functions/archesFunctions')
 
 export default {
   name: 'globe',
@@ -268,7 +270,7 @@ export default {
         m.makeRotationAxis(vecX, 20 * DEG2RAD);
         vm.landMesh.applyMatrix4(m);
       };
-      img.src = require("../assets/worldmap2.png");
+      img.src = require("../../assets/worldmap2.png");
 
     },
     visibilityForCoordinate: function (long, lat) {
@@ -299,38 +301,38 @@ export default {
       this.scene.add(this.archesGroup);
       this.scene.add(this.tubesGroup);
     },
-    rotateArches: function () {
-      const m = new Three.Matrix4();
-      const vecY = new Three.Vector3(0, 1, 0);
-      m.makeRotationAxis(vecY, -25 * DEG2RAD);
-
-      for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-        this.arches[archInd].curveMesh.applyMatrix4(m);
-        this.arches[archInd].tubeMesh.applyMatrix4(m);
-      }
-
-      const vecX = new Three.Vector3(1, 0, 0);
-      m.makeRotationAxis(vecX, 20 * DEG2RAD);
-      for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-        this.arches[archInd].curveMesh.applyMatrix4(m);
-        this.arches[archInd].tubeMesh.applyMatrix4(m);
-      }
-    },
-    fillDistances: function () {
-      for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-        this.distances.push(this.arches[archInd].onLandDistance);
-
-        console.log(this.distances[archInd]);
-      }
-    },
+    //rotateArches: function () {
+    //  const m = new Three.Matrix4();
+    //  const vecY = new Three.Vector3(0, 1, 0);
+    //  m.makeRotationAxis(vecY, -25 * DEG2RAD);
+//
+    //  for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
+    //    this.arches[archInd].curveMesh.applyMatrix4(m);
+    //    this.arches[archInd].tubeMesh.applyMatrix4(m);
+    //  }
+//
+    //  const vecX = new Three.Vector3(1, 0, 0);
+    //  m.makeRotationAxis(vecX, 20 * DEG2RAD);
+    //  for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
+    //    this.arches[archInd].curveMesh.applyMatrix4(m);
+    //    this.arches[archInd].tubeMesh.applyMatrix4(m);
+    //  }
+    //},
+    //fillDistances: function () {
+    //  for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
+    //    this.distances.push(this.arches[archInd].onLandDistance);
+//
+    //    console.log(this.distances[archInd]);
+    //  }
+    //},
   },
   mounted() {
     this.init();
     window.addEventListener('mousemove', this.onMouseMove, false);
     this.loadWorldMap();
     this.drawArch();
-    this.rotateArches();
-    this.fillDistances();
+    archFunc.rotateArches(this.arches);
+    archFunc.fillDistances(this.arches, this.distances);
     this.animate();
   }
 }
