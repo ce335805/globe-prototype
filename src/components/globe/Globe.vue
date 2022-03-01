@@ -41,6 +41,10 @@
     <project-card id="project9" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[9]">
       <div>This is project 9!</div>
     </project-card>
+
+    <project-card id="project10" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[10]">
+      <div>This is the moon :D</div>
+    </project-card>
   </div>
 </template>
 
@@ -51,6 +55,7 @@ import {DEG2RAD} from "three/src/math/MathUtils";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
 import archClass from "@/classes/arch";
 import ProjectCard from "@/components/projectCard";
+//import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 
 import vertexShader from 'raw-loader!glslify-loader!../../assets/shaders/vertex.glsl'
 import fragmentShader from 'raw-loader!glslify-loader!../../assets/shaders/fragment.glsl'
@@ -104,7 +109,7 @@ export default {
       this.containerRect = container.getBoundingClientRect();
       this.container = container;
       this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.005, 10);
-      this.camera.position.z = 2.4;
+      this.camera.position.z = 2.8;
 
       this.scene = new Three.Scene();
 
@@ -143,8 +148,8 @@ export default {
       directionalLight3.position.set(-1, 1.5, 1.5);
       this.scene.add(directionalLight3);
 
-      const directionalLight5 = new Three.DirectionalLight(0xffffff, .8);
-      directionalLight5.position.set(-1, 1., -1.5);
+      const directionalLight5 = new Three.DirectionalLight(0xffffff, .4);
+      directionalLight5.position.set(-1, 1., -2.);
       this.scene.add(directionalLight5);
 
       const directionalLight6 = new Three.DirectionalLight(0xffffff, 1.25);
@@ -160,7 +165,6 @@ export default {
       container.appendChild(this.renderer.domElement);
 
       this.renderer.setClearColor( 0xffffff, 0);
-      //this.scene.background = new Three.Color(0xffffff);
 
       //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       //this.controls.update();
@@ -212,7 +216,6 @@ export default {
         this.arches[this.intersectedIndex].curveMesh.material.color.setHex(color0);
         document.body.style.cursor = 'auto';
       }
-      //this.controls.update();
     },
     drawCircles: function () {
       let geometries = [];
@@ -280,16 +283,17 @@ export default {
     },
     drawArch: function () {
       this.arches = [
-        new archClass(this.coordinatesArches[0][0], this.coordinatesArches[0][1]),
-        new archClass(this.coordinatesArches[1][0], this.coordinatesArches[1][1]),
-        new archClass(this.coordinatesArches[2][0], this.coordinatesArches[2][1]),
-        new archClass(this.coordinatesArches[3][0], this.coordinatesArches[3][1]),
-        new archClass(this.coordinatesArches[4][0], this.coordinatesArches[4][1]),
-        new archClass(this.coordinatesArches[5][0], this.coordinatesArches[5][1]),
-        new archClass(this.coordinatesArches[6][0], this.coordinatesArches[6][1]),
-        new archClass(this.coordinatesArches[7][0], this.coordinatesArches[7][1]),
-        new archClass(this.coordinatesArches[8][0], this.coordinatesArches[8][1]),
-        new archClass(this.coordinatesArches[9][0], this.coordinatesArches[9][1])
+        new archClass(this.coordinatesArches[0][0], this.coordinatesArches[0][1], false),
+        new archClass(this.coordinatesArches[1][0], this.coordinatesArches[1][1], false),
+        new archClass(this.coordinatesArches[2][0], this.coordinatesArches[2][1], false),
+        new archClass(this.coordinatesArches[3][0], this.coordinatesArches[3][1], false),
+        new archClass(this.coordinatesArches[4][0], this.coordinatesArches[4][1], false),
+        new archClass(this.coordinatesArches[5][0], this.coordinatesArches[5][1], false),
+        new archClass(this.coordinatesArches[6][0], this.coordinatesArches[6][1], false),
+        new archClass(this.coordinatesArches[7][0], this.coordinatesArches[7][1], false),
+        new archClass(this.coordinatesArches[8][0], this.coordinatesArches[8][1], false),
+        new archClass(this.coordinatesArches[9][0], this.coordinatesArches[9][1], false),
+        new archClass(this.coordinatesArches[9][0], this.coordinatesArches[9][1], true),
       ];
       this.archesGroup = new Three.Group();
       this.tubesGroup = new Three.Group();
@@ -297,34 +301,13 @@ export default {
         //this.scene.add(this.arches[archInd].curveMesh);
         this.archesGroup.add(this.arches[archInd].curveMesh);
         this.tubesGroup.add(this.arches[archInd].tubeMesh);
+
       }
+      //this.scene.add(this.arches[0].ellipse);
+      //this.scene.add(this.arches[0].circleMeshA);
       this.scene.add(this.archesGroup);
       this.scene.add(this.tubesGroup);
     },
-    //rotateArches: function () {
-    //  const m = new Three.Matrix4();
-    //  const vecY = new Three.Vector3(0, 1, 0);
-    //  m.makeRotationAxis(vecY, -25 * DEG2RAD);
-//
-    //  for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-    //    this.arches[archInd].curveMesh.applyMatrix4(m);
-    //    this.arches[archInd].tubeMesh.applyMatrix4(m);
-    //  }
-//
-    //  const vecX = new Three.Vector3(1, 0, 0);
-    //  m.makeRotationAxis(vecX, 20 * DEG2RAD);
-    //  for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-    //    this.arches[archInd].curveMesh.applyMatrix4(m);
-    //    this.arches[archInd].tubeMesh.applyMatrix4(m);
-    //  }
-    //},
-    //fillDistances: function () {
-    //  for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-    //    this.distances.push(this.arches[archInd].onLandDistance);
-//
-    //    console.log(this.distances[archInd]);
-    //  }
-    //},
   },
   mounted() {
     this.init();

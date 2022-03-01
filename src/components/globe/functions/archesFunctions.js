@@ -9,6 +9,7 @@ export function rotateArches (arches) {
     for (let archInd = 0; archInd < arches.length; archInd += 1) {
         arches[archInd].curveMesh.applyMatrix4(m);
         arches[archInd].tubeMesh.applyMatrix4(m);
+        //arches[archInd].ellipse.applyMatrix4(m);
     }
 
     const vecX = new Three.Vector3(1, 0, 0);
@@ -16,6 +17,7 @@ export function rotateArches (arches) {
     for (let archInd = 0; archInd < arches.length; archInd += 1) {
         arches[archInd].curveMesh.applyMatrix4(m);
         arches[archInd].tubeMesh.applyMatrix4(m);
+        //arches[archInd].ellipse.applyMatrix4(m);
     }
 }
 
