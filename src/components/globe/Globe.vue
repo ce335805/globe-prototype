@@ -2,48 +2,57 @@
   <div>
     <div id="container"></div>
 
-    <project-card id="project0" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[0]">
+    <project-card id="project0" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[0]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 0!</div>
     </project-card>
 
-    <project-card id="project1" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[1]">
+    <project-card id="project1" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[1]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 1!</div>
     </project-card>
 
-    <project-card id="project2" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[2]">
+    <project-card id="project2" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[2]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 2!</div>
     </project-card>
 
-    <project-card id="project3" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[3]">
+    <project-card id="project3" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[3]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 3!</div>
     </project-card>
 
-    <project-card id="project4" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[4]">
+    <project-card id="project4" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[4]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 4!</div>
     </project-card>
 
-    <project-card id="project5" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[5]">
+    <project-card id="project5" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[5]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 5!</div>
     </project-card>
 
-    <project-card id="project6" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[6]">
+    <project-card id="project6" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[6]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 6!</div>
     </project-card>
 
-    <project-card id="project7" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[7]">
+    <project-card id="project7" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[7]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 7!</div>
     </project-card>
 
-    <project-card id="project8" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[8]">
+    <project-card id="project8" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[8]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 8!</div>
     </project-card>
 
-    <project-card id="project9" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[9]">
+    <project-card id="project9" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[9]" v-bind:url="'www.vivaconagua.org/en/'">
       <div>This is project 9!</div>
     </project-card>
 
-    <project-card id="project10" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[10]">
-      <div>This is the moon :D</div>
+    <project-card id="project10" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[10]" v-bind:url="'wikipedia.org/wiki/Moon'">
+      <div>
+        <div class="imageContainer">
+          <img class="image" src="./../../assets/Moon.jpg" alt="A picture of the moon.">
+        </div>
+        <div class="textContainer">
+          <h3>The Moon</h3>
+          <p>People are saying "One should reach for the stars". This is a little too ambitious for us at the moment.
+            Instead, we are going for the moon which seems to be quite within reach!</p>
+        </div>
+      </div>
     </project-card>
   </div>
 </template>
@@ -87,7 +96,7 @@ export default {
         [[0.9326, 0.1740], [0.9 * DEG2RAD, 37.3 * DEG2RAD]],//Kenya
         [[0.9326, 0.1740], [8.9 * DEG2RAD, 37.2 * DEG2RAD]],//Ethopia, Ijaji
         [[0.9326, 0.1740], [-18.8 * DEG2RAD, 30.0 * DEG2RAD]],//Zimbabwe
-        [[0.9326, 0.1740], [8.9 * DEG2RAD, -11.7 * DEG2RAD]],//Sierra Leone
+        [[0.9326, 0.1740], [9.5 * DEG2RAD, -10. * DEG2RAD]],//Sierra Leone 8.9, -11.7
         [[0.9326, 0.1740], [17.8 * DEG2RAD, 34.9 * DEG2RAD]],//Mozambique
         [[0.9326, 0.1740], [13.7 * DEG2RAD, 26.4 * DEG2RAD]],//Zambia
         [[0.9326, 0.1740], [10.6 * DEG2RAD, 38.0 * DEG2RAD]]//Ethiopia
@@ -96,10 +105,11 @@ export default {
       archesGroup: null,
       tubesGroup: null,
       mouse: new Three.Vector2(),
+      click: new Three.Vector2(),
       INTERSECTED: null,
       intersectedIndex: 1,
       containerRect: null,
-      kmRun: 2871,
+      kmRun: 154000,
       distances: [],
     }
   },
@@ -164,7 +174,7 @@ export default {
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(this.renderer.domElement);
 
-      this.renderer.setClearColor( 0xffffff, 0);
+      this.renderer.setClearColor(0xffffff, 0);
 
       //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       //this.controls.update();
@@ -178,6 +188,9 @@ export default {
     onMouseMove: function (event) {
       this.mouse.x = ((event.clientX - this.containerRect.left) / this.container.clientWidth) * 2 - 1;
       this.mouse.y = -((event.clientY - this.containerRect.top) / this.container.clientHeight) * 2 + 1;
+    },
+    onClick: function (event) {
+      console.log(event);
     },
     update: function () {
       var vector = new Three.Vector3(this.mouse.x, this.mouse.y, 1.);
@@ -312,6 +325,7 @@ export default {
   mounted() {
     this.init();
     window.addEventListener('mousemove', this.onMouseMove, false);
+    window.addEventListener('click', this.onClick, false);
     this.loadWorldMap();
     this.drawArch();
     archFunc.rotateArches(this.arches);
@@ -327,6 +341,24 @@ export default {
   float: left;
   height: 800px;
   width: 800px;
+}
+
+.imageContainer{
+  float: left;
+  padding: 10px;
+}
+
+.textContainer{
+  padding: 10px;
+}
+
+p{
+  text-align: justify;
+}
+
+.image {
+  width: 200px;
+  height: 200px;
 }
 
 </style>
