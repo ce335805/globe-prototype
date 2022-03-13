@@ -1,6 +1,7 @@
 import * as Three from 'three'
 import {CubicBezierCurve3} from "three";
 import Ellipse from "@/classes/ellipse";
+import {DEG2RAD} from "three/src/math/MathUtils";
 
 export default class archClass {
     startPoint = null;
@@ -130,7 +131,7 @@ export default class archClass {
 
         this.tubeGeometry = new Three.TubeBufferGeometry(curve, 50, 0.015, 4, false);
         const tubeMaterial = new Three.MeshBasicMaterial({
-            color: 0xffc97b,
+            color: 0x000000,
             transparent: true,
             opacity: 0.0
         });
@@ -208,6 +209,25 @@ export default class archClass {
 
     }
 
+    addToScene(scene){
+        scene.add(this.curveMesh);
+        scene.add(this.tubeMesh);
+    }
 
+    rotateX(angleX){
+        const mX = new Three.Matrix4();
+        const vecX = new Three.Vector3(1, 0, 0);
+        mX.makeRotationAxis(vecX, angleX * DEG2RAD);
+        this.curveMesh.applyMatrix4(mX);
+        this.tubeMesh.applyMatrix4(mX);
+    }
+
+    rotateY(angleY){
+        const mY = new Three.Matrix4();
+        const vecY = new Three.Vector3(0, 1, 0);
+        mY.makeRotationAxis(vecY, angleY * DEG2RAD);
+        this.curveMesh.applyMatrix4(mY);
+        this.tubeMesh.applyMatrix4(mY);
+    }
 }
 

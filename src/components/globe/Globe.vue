@@ -1,56 +1,14 @@
 <template>
   <div>
     <div id="container"></div>
-
-    <project-card id="project0" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[0]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 0!</div>
-    </project-card>
-
-    <project-card id="project1" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[1]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 1!</div>
-    </project-card>
-
-    <project-card id="project2" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[2]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 2!</div>
-    </project-card>
-
-    <project-card id="project3" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[3]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 3!</div>
-    </project-card>
-
-    <project-card id="project4" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[4]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 4!</div>
-    </project-card>
-
-    <project-card id="project5" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[5]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 5!</div>
-    </project-card>
-
-    <project-card id="project6" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[6]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 6!</div>
-    </project-card>
-
-    <project-card id="project7" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[7]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 7!</div>
-    </project-card>
-
-    <project-card id="project8" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[8]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 8!</div>
-    </project-card>
-
-    <project-card id="project9" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[9]" v-bind:url="'www.vivaconagua.org/en/'">
-      <div>This is project 9!</div>
-    </project-card>
-
-    <project-card id="project10" v-bind:km-run="this.kmRun" v-bind:km-distance="this.distances[10]" v-bind:url="'wikipedia.org/wiki/Moon'">
+    <project-card v-for="(project, index) in projects" :key="project.title" :id="'project' + index" v-bind:km-run="kmRun" v-bind:project="project">
       <div>
         <div class="imageContainer">
-          <img class="image" src="./../../assets/Moon.jpg" alt="A picture of the moon.">
+          <img class="image" :src="project.imgUrl" alt="A picture of the moon.">
         </div>
         <div class="textContainer">
-          <h3>The Moon</h3>
-          <p>People are saying "One should reach for the stars". This is a little too ambitious for us at the moment.
-            Instead, we are going for the moon which seems to be quite within reach!</p>
+          <h3>{{project.title}}</h3>
+          <p>{{project.description}}</p>
         </div>
       </div>
     </project-card>
@@ -62,22 +20,19 @@ import * as Three from 'three'
 import {DEG2RAD} from "three/src/math/MathUtils";
 //import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
-import archClass from "@/classes/arch";
 import ProjectCard from "@/components/projectCard";
-//import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 
 import vertexShader from 'raw-loader!glslify-loader!../../assets/shaders/vertex.glsl'
 import fragmentShader from 'raw-loader!glslify-loader!../../assets/shaders/fragment.glsl'
 
-var archFunc = require('./functions/archesFunctions')
-
 export default {
   name: 'globe',
   components: {ProjectCard},
+  props: ['projects', 'kmRun'],
   data() {
     return {
       container: null,
-      drawnLatDegs: 180,
       camera: null,
       scene: null,
       renderer: null,
@@ -89,19 +44,6 @@ export default {
       imgWidth: 0,
       imgHeight: 0,
       landMesh: null,
-      coordinatesArches: [
-        [[0.9326, 0.1740], [0.0593, 0.5936]],
-        [[0.9326, 0.1740], [26.6 * DEG2RAD, 86.8 * DEG2RAD]],//Nepal
-        [[0.9326, 0.1740], [23.4 * DEG2RAD, 78.8 * DEG2RAD]],//India
-        [[0.9326, 0.1740], [0.9 * DEG2RAD, 37.3 * DEG2RAD]],//Kenya
-        [[0.9326, 0.1740], [8.9 * DEG2RAD, 37.2 * DEG2RAD]],//Ethopia, Ijaji
-        [[0.9326, 0.1740], [-18.8 * DEG2RAD, 30.0 * DEG2RAD]],//Zimbabwe
-        [[0.9326, 0.1740], [9.5 * DEG2RAD, -10. * DEG2RAD]],//Sierra Leone 8.9, -11.7
-        [[0.9326, 0.1740], [17.8 * DEG2RAD, 34.9 * DEG2RAD]],//Mozambique
-        [[0.9326, 0.1740], [13.7 * DEG2RAD, 26.4 * DEG2RAD]],//Zambia
-        [[0.9326, 0.1740], [10.6 * DEG2RAD, 38.0 * DEG2RAD]]//Ethiopia
-      ],
-      arches: [],
       archesGroup: null,
       tubesGroup: null,
       mouse: new Three.Vector2(),
@@ -109,8 +51,8 @@ export default {
       INTERSECTED: null,
       intersectedIndex: 1,
       containerRect: null,
-      kmRun: 154000,
-      distances: [],
+      aspectAngleY: -25,
+      aspectAngleX: 20,
     }
   },
   methods: {
@@ -176,13 +118,13 @@ export default {
 
       this.renderer.setClearColor(0xffffff, 0);
 
-      //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-      //this.controls.update();
+      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.update();
     },
     animate: function () {
       requestAnimationFrame(this.animate);
-      //this.controls.update();
-      this.update();
+      this.controls.update();
+      //this.update();
       this.renderer.render(this.scene, this.camera);
     },
     onMouseMove: function (event) {
@@ -192,44 +134,44 @@ export default {
     onClick: function (event) {
       console.log(event);
     },
-    update: function () {
-      var vector = new Three.Vector3(this.mouse.x, this.mouse.y, 1.);
-      vector.unproject(this.camera);
-      var ray = new Three.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
-
-      var intersects = ray.intersectObjects(this.tubesGroup.children);
-
-      const color0 = 0xffc97b;
-      const colorHovered = 0xf57b42;
-
-      if (intersects.length > 0) {
-        if (intersects[0].object !== this.INTERSECTED) {
-          if (this.INTERSECTED) {
-            this.INTERSECTED.material.opacity = 0.;
-            document.getElementById("project" + this.intersectedIndex).style.display = "none";
-            this.arches[this.intersectedIndex].curveMesh.material.color.setHex(color0);
-          }
-          this.INTERSECTED = intersects[0].object;
-          this.INTERSECTED.material.opacity = 0.15;
-
-          for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-            if (this.INTERSECTED === this.arches[archInd].tubeMesh) {
-              this.intersectedIndex = archInd;
-            }
-          }
-          document.body.style.cursor = 'pointer';
-          document.getElementById("project" + this.intersectedIndex).style.display = "block";
-          this.arches[this.intersectedIndex].curveMesh.material.color.setHex(colorHovered);
-        }
-      } else {
-        if (this.INTERSECTED)
-          this.INTERSECTED.material.opacity = 0.;
-        this.INTERSECTED = null;
-        document.getElementById("project" + this.intersectedIndex).style.display = "none";
-        this.arches[this.intersectedIndex].curveMesh.material.color.setHex(color0);
-        document.body.style.cursor = 'auto';
-      }
-    },
+    //update: function () {
+    //  var vector = new Three.Vector3(this.mouse.x, this.mouse.y, 1.);
+    //  vector.unproject(this.camera);
+    //  var ray = new Three.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
+//
+    //  var intersects = ray.intersectObjects(this.tubesGroup.children);
+//
+    //  const color0 = 0xffc97b;
+    //  const colorHovered = 0xf57b42;
+//
+    //  if (intersects.length > 0) {
+    //    if (intersects[0].object !== this.INTERSECTED) {
+    //      if (this.INTERSECTED) {
+    //        this.INTERSECTED.material.opacity = 0.;
+    //        document.getElementById("project" + this.intersectedIndex).style.display = "none";
+    //        this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(color0);
+    //      }
+    //      this.INTERSECTED = intersects[0].object;
+    //      this.INTERSECTED.material.opacity = 0.15;
+//
+    //      for (let projectInd = 0; projectInd < this.projects.length; projectInd += 1) {
+    //        if (this.INTERSECTED === this.projects[projectInd].getTubeMesh()) {
+    //          this.intersectedIndex = projectInd;
+    //        }
+    //      }
+    //      document.body.style.cursor = 'pointer';
+    //      document.getElementById("project" + this.intersectedIndex).style.display = "block";
+    //      this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(colorHovered);
+    //    }
+    //  } else {
+    //    if (this.INTERSECTED)
+    //      this.INTERSECTED.material.opacity = 0.;
+    //    this.INTERSECTED = null;
+    //    document.getElementById("project" + this.intersectedIndex).style.display = "none";
+    //    this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(color0);
+    //    document.body.style.cursor = 'auto';
+    //  }
+    //},
     drawCircles: function () {
       let geometries = [];
       for (let lat = -90; lat <= 90; lat += 180 / this.rows) {
@@ -269,7 +211,6 @@ export default {
       let img = new Image();
       let vm = this;
       img.onload = function () {
-        //console.log('image loaded');
         cnvs.width = img.width;
         cnvs.height = img.height;
         ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
@@ -280,44 +221,31 @@ export default {
         //rotate globe to nice position
         const m = new Three.Matrix4();
         const vecY = new Three.Vector3(0, 1, 0);
-        m.makeRotationAxis(vecY, -25 * DEG2RAD);
+        m.makeRotationAxis(vecY, vm.aspectAngleY * DEG2RAD);
         vm.landMesh.applyMatrix4(m);
         const vecX = new Three.Vector3(1, 0, 0);
-        m.makeRotationAxis(vecX, 20 * DEG2RAD);
+        m.makeRotationAxis(vecX, vm.aspectAngleX * DEG2RAD);
         vm.landMesh.applyMatrix4(m);
       };
       img.src = require("../../assets/worldmap2.png");
 
     },
     visibilityForCoordinate: function (long, lat) {
-      const pixelRow = Math.floor(this.imgHeight / this.drawnLatDegs * (-lat + this.drawnLatDegs / 2));
+      const pixelRow = Math.floor(this.imgHeight / 180 * (-lat + 90));
       const pixelColumn = Math.floor(this.imgWidth / 360 * ((long + 180) % 360));
       return this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 120;
     },
     drawArch: function () {
-      this.arches = [
-        new archClass(this.coordinatesArches[0][0], this.coordinatesArches[0][1], false),
-        new archClass(this.coordinatesArches[1][0], this.coordinatesArches[1][1], false),
-        new archClass(this.coordinatesArches[2][0], this.coordinatesArches[2][1], false),
-        new archClass(this.coordinatesArches[3][0], this.coordinatesArches[3][1], false),
-        new archClass(this.coordinatesArches[4][0], this.coordinatesArches[4][1], false),
-        new archClass(this.coordinatesArches[5][0], this.coordinatesArches[5][1], false),
-        new archClass(this.coordinatesArches[6][0], this.coordinatesArches[6][1], false),
-        new archClass(this.coordinatesArches[7][0], this.coordinatesArches[7][1], false),
-        new archClass(this.coordinatesArches[8][0], this.coordinatesArches[8][1], false),
-        new archClass(this.coordinatesArches[9][0], this.coordinatesArches[9][1], false),
-        new archClass(this.coordinatesArches[9][0], this.coordinatesArches[9][1], true),
-      ];
       this.archesGroup = new Three.Group();
       this.tubesGroup = new Three.Group();
-      for (let archInd = 0; archInd < this.arches.length; archInd += 1) {
-        //this.scene.add(this.arches[archInd].curveMesh);
-        this.archesGroup.add(this.arches[archInd].curveMesh);
-        this.tubesGroup.add(this.arches[archInd].tubeMesh);
-
+      this.archesGroup.renderOrder = 0;
+      this.tubesGroup.renderOrder = 2;
+      for (let projectInd = 0; projectInd < this.projects.length; projectInd += 1) {
+        this.projects[projectInd].arch.rotateY(this.aspectAngleY, 0);
+        this.projects[projectInd].arch.rotateX(this.aspectAngleX, 0);
+        this.archesGroup.add(this.projects[projectInd].getArchMesh());
+        this.tubesGroup.add(this.projects[projectInd].getTubeMesh());
       }
-      //this.scene.add(this.arches[0].ellipse);
-      //this.scene.add(this.arches[0].circleMeshA);
       this.scene.add(this.archesGroup);
       this.scene.add(this.tubesGroup);
     },
@@ -328,8 +256,6 @@ export default {
     window.addEventListener('click', this.onClick, false);
     this.loadWorldMap();
     this.drawArch();
-    archFunc.rotateArches(this.arches);
-    archFunc.fillDistances(this.arches, this.distances);
     this.animate();
   }
 }

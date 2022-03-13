@@ -19,7 +19,7 @@
 
 export default {
   name: "projectCard",
-  props: ['kmRun', 'kmDistance', 'url'],
+  props: ['kmRun', 'project'],
   data() {
     return {
       allCards: null
@@ -27,26 +27,26 @@ export default {
   },
   computed: {
     progressFractionModulo: function () {
-      const progressNumeric = ((this.kmRun / this.kmDistance) * 100) % 100;
+      const progressNumeric = ((this.kmRun / this.project.distance) * 100) % 100;
       return progressNumeric.toString() + "%";
     },
     isReached: function () {
-      return this.kmRun > this.kmDistance;
+      return this.kmRun > this.project.distance;
     },
     multiples: function () {
-      return Math.floor(this.kmRun / this.kmDistance);
+      return Math.floor(this.kmRun / this.project.distance);
     },
     isInfoRight: function () {
-      return ((this.kmRun / this.kmDistance) * 100) % 100 < 50;
+      return ((this.kmRun / this.project.distance) * 100) % 100 < 50;
     },
     isInfoLeft: function () {
-      return ((this.kmRun / this.kmDistance) * 100) % 100 >= 50;
+      return ((this.kmRun / this.project.distance) * 100) % 100 >= 50;
     },
     infoRight: function () {
       if(this.isReached){
         return this.multiples.toString() + " times";
       } else {
-        return (this.kmDistance - this.kmRun).toString() + "km to go";
+        return (this.project.distance - this.kmRun).toString() + "km to go";
       }
     },
     infoLeft: function () {
@@ -69,7 +69,7 @@ export default {
     }
   },
   mounted() {
-    const progressNumeric = this.kmRun / this.kmDistance * 100;
+    const progressNumeric = this.kmRun / this.project.distance * 100;
     this.progressFractionModulo = progressNumeric.toString() + "%";
     this.allCards = document.getElementsByClassName('projectCard');
     window.addEventListener('mousemove', this.onMouseMove, false);
