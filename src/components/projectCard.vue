@@ -1,5 +1,5 @@
 <template>
-  <div class="projectCard">
+  <div class="projectCard" v-bind:class="{hovered: isHovered}">
     <slot></slot>
     <div class="progress">
     <div class="progressBar"
@@ -19,7 +19,7 @@
 
 export default {
   name: "projectCard",
-  props: ['kmRun', 'project'],
+  props: ['kmRun', 'project', 'isHovered'],
   data() {
     return {
       allCards: null
@@ -69,8 +69,6 @@ export default {
     }
   },
   mounted() {
-    const progressNumeric = this.kmRun / this.project.distance * 100;
-    this.progressFractionModulo = progressNumeric.toString() + "%";
     this.allCards = document.getElementsByClassName('projectCard');
     window.addEventListener('mousemove', this.onMouseMove, false);
   }
@@ -78,14 +76,21 @@ export default {
 </script>
 
 <style scoped>
+
+.hovered{
+  background-color: #ff99aa;
+}
+.nothovered{
+  width: 100px;
+}
+
 .projectCard {
   box-sizing: border-box;
   position: absolute;
-  display: none;
   width: 500px;
+  display: block;
 
   padding: 0px;
-  background-color: #ffffff;
 
 
   border-style: solid;

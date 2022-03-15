@@ -1,14 +1,15 @@
 <template>
   <div>
     <div id="container"></div>
-    <project-card v-for="(project, index) in projects" :key="project.title" :id="'project' + index" v-bind:km-run="kmRun" v-bind:project="project">
+    <project-card v-for="(project, index) in this.projects" :key="project.title" v-bind:id="'project' + index"
+                  v-bind:km-run="kmRun" v-bind:project="project" v-bind:is-hovered="hovered">
       <div>
         <div class="imageContainer">
           <img class="image" :src="project.imgUrl" alt="A picture of the moon.">
         </div>
         <div class="textContainer">
-          <h3>{{project.title}}</h3>
-          <p>{{project.description}}</p>
+          <h3>{{ project.title }}</h3>
+          <p>{{ project.description }}</p>
         </div>
       </div>
     </project-card>
@@ -49,10 +50,12 @@ export default {
       mouse: new Three.Vector2(),
       click: new Three.Vector2(),
       INTERSECTED: null,
-      intersectedIndex: 1,
+      intersectedIndex: 0,
       containerRect: null,
       aspectAngleY: -25,
       aspectAngleX: 20,
+      hoveredArray: [],
+      hovered: false,
     }
   },
   methods: {
@@ -124,7 +127,7 @@ export default {
     animate: function () {
       requestAnimationFrame(this.animate);
       this.controls.update();
-      //this.update();
+      this.update();
       this.renderer.render(this.scene, this.camera);
     },
     onMouseMove: function (event) {
@@ -134,44 +137,51 @@ export default {
     onClick: function (event) {
       console.log(event);
     },
-    //update: function () {
-    //  var vector = new Three.Vector3(this.mouse.x, this.mouse.y, 1.);
-    //  vector.unproject(this.camera);
-    //  var ray = new Three.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
-//
-    //  var intersects = ray.intersectObjects(this.tubesGroup.children);
-//
-    //  const color0 = 0xffc97b;
-    //  const colorHovered = 0xf57b42;
-//
-    //  if (intersects.length > 0) {
-    //    if (intersects[0].object !== this.INTERSECTED) {
-    //      if (this.INTERSECTED) {
-    //        this.INTERSECTED.material.opacity = 0.;
-    //        document.getElementById("project" + this.intersectedIndex).style.display = "none";
-    //        this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(color0);
-    //      }
-    //      this.INTERSECTED = intersects[0].object;
-    //      this.INTERSECTED.material.opacity = 0.15;
-//
-    //      for (let projectInd = 0; projectInd < this.projects.length; projectInd += 1) {
-    //        if (this.INTERSECTED === this.projects[projectInd].getTubeMesh()) {
-    //          this.intersectedIndex = projectInd;
-    //        }
-    //      }
-    //      document.body.style.cursor = 'pointer';
-    //      document.getElementById("project" + this.intersectedIndex).style.display = "block";
-    //      this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(colorHovered);
-    //    }
-    //  } else {
-    //    if (this.INTERSECTED)
-    //      this.INTERSECTED.material.opacity = 0.;
-    //    this.INTERSECTED = null;
-    //    document.getElementById("project" + this.intersectedIndex).style.display = "none";
-    //    this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(color0);
-    //    document.body.style.cursor = 'auto';
-    //  }
-    //},
+    update: function () {
+      var vector = new Three.Vector3(this.mouse.x, this.mouse.y, 1.);
+      vector.unproject(this.camera);
+      var ray = new Three.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
+
+      var intersects = ray.intersectObjects(this.tubesGroup.children);
+
+      const color0 = 0xffc97b;
+      const colorHovered = 0xf57b42;
+
+      if (intersects.length > 0) {
+        if (intersects[0].object !== this.INTERSECTED) {
+          if (this.INTERSECTED) {
+            this.INTERSECTED.material.opacity = 0.;
+            //document.getElementById("project" + this.intersectedIndex).style.display = "none";
+            this.hoveredArray[this.intersectedIndex] = false;
+            this.hovered = false;
+            this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(color0);
+          }
+          this.INTERSECTED = intersects[0].object;
+          this.INTERSECTED.material.opacity = 0.15;
+
+          for (let projectInd = 0; projectInd < this.projects.length; projectInd += 1) {
+            if (this.INTERSECTED === this.projects[projectInd].getTubeMesh()) {
+              this.intersectedIndex = projectInd;
+            }
+          }
+          document.body.style.cursor = 'pointer';
+          //document.getElementById("project" + this.intersectedIndex).style.display = "block";
+          this.hoveredArray[this.intersectedIndex] = true;
+          this.hovered = true;
+          this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(colorHovered);
+        }
+      } else {
+        if (this.INTERSECTED)
+          this.INTERSECTED.material.opacity = 0.;
+        this.INTERSECTED = null;
+        //document.getElementById("project" + this.intersectedIndex).style.display = "none";
+        this.hoveredArray[this.intersectedIndex] = false;
+        this.hovered = false;
+        this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(color0);
+        document.body.style.cursor = 'auto';
+      }
+      console.log(this.hoveredArray[0]);
+    },
     drawCircles: function () {
       let geometries = [];
       for (let lat = -90; lat <= 90; lat += 180 / this.rows) {
@@ -249,6 +259,11 @@ export default {
       this.scene.add(this.archesGroup);
       this.scene.add(this.tubesGroup);
     },
+    fillHoveredArray: function () {
+      for (let projectInd = 0; projectInd < this.projects.length; projectInd += 1) {
+        this.hoveredArray.push(true);
+      }
+    }
   },
   mounted() {
     this.init();
@@ -256,6 +271,7 @@ export default {
     window.addEventListener('click', this.onClick, false);
     this.loadWorldMap();
     this.drawArch();
+    this.fillHoveredArray();
     this.animate();
   }
 }
@@ -269,16 +285,16 @@ export default {
   width: 800px;
 }
 
-.imageContainer{
+.imageContainer {
   float: left;
   padding: 10px;
 }
 
-.textContainer{
+.textContainer {
   padding: 10px;
 }
 
-p{
+p {
   text-align: justify;
 }
 

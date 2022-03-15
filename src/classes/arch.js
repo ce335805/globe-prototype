@@ -131,7 +131,7 @@ export default class archClass {
 
         this.tubeGeometry = new Three.TubeBufferGeometry(curve, 50, 0.015, 4, false);
         const tubeMaterial = new Three.MeshBasicMaterial({
-            color: 0x000000,
+            color: 0xffc97b,
             transparent: true,
             opacity: 0.0
         });
