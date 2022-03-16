@@ -1,28 +1,39 @@
 <template>
-  <div class="projectCard" v-bind:class="{hovered: isHovered}">
-    <slot></slot>
-    <div class="progress">
-    <div class="progressBar"
-         v-bind:class="{ lightBackground: this.isReached }">
-      <div class="multiplesRight" v-if="this.isInfoRight">{{this.infoRight}}</div>
-      <div class="colorBar" v-bind:style="{ width: this.progressFractionModulo }">
-        <div class="multiplesLeft" v-if="this.isInfoLeft">{{this.infoLeft}}</div>
+  <div class="projectCard" v-bind:class="{show: this.showCard, hide: !this.showCard}">
+
+    <div>
+      <div class="imageContainer">
+        <img class="image" src="./../assets/Moon.jpg" alt="A picture of the moon.">
+      </div>
+      <div class="textContainer">
+        <h3>{{ project.title }}</h3>
+        <p>{{ project.description }}</p>
       </div>
     </div>
-    <div v-if="this.isReached"><p>We ran to this project {{this.multiples}} times! {{this.kmRun}}km in total!</p></div>
+
+    <div class="progress">
+      <div class="progressBar"
+           v-bind:class="{ lightBackground: this.isReached }">
+        <div class="multiplesRight" v-if="this.isInfoRight">{{ this.infoRight }}</div>
+        <div class="colorBar" v-bind:style="{ width: this.progressFractionModulo }">
+          <div class="multiplesLeft" v-if="this.isInfoLeft">{{ this.infoLeft }}</div>
+        </div>
+      </div>
+      <div v-if="this.isReached"><p>We ran to this project {{ this.multiples }} times! {{ this.kmRun }}km in total!</p>
+      </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>
-//import * as Three from "three";
 
 export default {
   name: "projectCard",
-  props: ['kmRun', 'project', 'isHovered'],
+  props: ['kmRun', 'project'],
   data() {
     return {
-      allCards: null
+      allCards: null,
+      showCard: false,
     }
   },
   computed: {
@@ -43,14 +54,14 @@ export default {
       return ((this.kmRun / this.project.distance) * 100) % 100 >= 50;
     },
     infoRight: function () {
-      if(this.isReached){
+      if (this.isReached) {
         return this.multiples.toString() + " times";
       } else {
         return (this.project.distance - this.kmRun).toString() + "km to go";
       }
     },
     infoLeft: function () {
-      if(this.isReached){
+      if (this.isReached) {
         return this.multiples.toString() + " times";
       } else {
         return this.kmRun.toString + "km done";
@@ -59,14 +70,10 @@ export default {
   },
   methods: {
     onMouseMove: function (event) {
-      for (let ind = 0; ind < this.allCards.length; ind++) {
-        this.allCards[ind].style.left = event.clientX + 20 + 'px';
-        this.allCards[ind].style.top = event.clientY + 20 + 'px';
-      }
+      this.showCard = true;
+      this.allCards[0].style.left = event.clientX + 20 + 'px';
+      this.allCards[0].style.top = event.clientY + 20 + 'px';
     },
-    onClick: function () {
-      window.open(this.url, '_blank').focus();
-    }
   },
   mounted() {
     this.allCards = document.getElementsByClassName('projectCard');
@@ -77,19 +84,19 @@ export default {
 
 <style scoped>
 
-.hovered{
-  background-color: #ff99aa;
+.show {
+  display: block;
 }
-.nothovered{
-  width: 100px;
+
+.hide {
+  display: none;
 }
 
 .projectCard {
   box-sizing: border-box;
   position: absolute;
   width: 500px;
-  display: block;
-
+  background-color: #ffffff;
   padding: 0px;
 
 
@@ -99,7 +106,7 @@ export default {
   border-radius: 4px;
 }
 
-.progress{
+.progress {
   box-sizing: border-box;
   clear: left;
   padding: 0px 5px 5px 5px;
@@ -127,6 +134,7 @@ export default {
 .lightBackground {
   background-color: #bee8ff;
 }
+
 .multiplesRight {
   float: right;
   font-size: 18px;
@@ -141,6 +149,25 @@ export default {
   font-size: 18px;
   margin-left: 5px;
   margin-right: 5px;
+}
+
+
+.imageContainer {
+  float: left;
+  padding: 10px;
+}
+
+.textContainer {
+  padding: 10px;
+}
+
+p {
+  text-align: justify;
+}
+
+.image {
+  width: 200px;
+  height: 200px;
 }
 
 </style>

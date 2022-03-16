@@ -1,17 +1,7 @@
 <template>
   <div>
     <div id="container"></div>
-    <project-card v-for="(project, index) in this.projects" :key="project.title" v-bind:id="'project' + index"
-                  v-bind:km-run="kmRun" v-bind:project="project" v-bind:is-hovered="hovered">
-      <div>
-        <div class="imageContainer">
-          <img class="image" :src="project.imgUrl" alt="A picture of the moon.">
-        </div>
-        <div class="textContainer">
-          <h3>{{ project.title }}</h3>
-          <p>{{ project.description }}</p>
-        </div>
-      </div>
+    <project-card v-if="renderCard" v-bind:km-run="kmRun" v-bind:project="projects[intersectedIndex]">
     </project-card>
   </div>
 </template>
@@ -22,7 +12,7 @@ import {DEG2RAD} from "three/src/math/MathUtils";
 //import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
 import ProjectCard from "@/components/projectCard";
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+//import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 
 import vertexShader from 'raw-loader!glslify-loader!../../assets/shaders/vertex.glsl'
 import fragmentShader from 'raw-loader!glslify-loader!../../assets/shaders/fragment.glsl'
@@ -37,7 +27,6 @@ export default {
       camera: null,
       scene: null,
       renderer: null,
-      //controls: null,
       globe: null,
       rows: 160,
       dotDensity: 80,
@@ -54,8 +43,7 @@ export default {
       containerRect: null,
       aspectAngleY: -25,
       aspectAngleX: 20,
-      hoveredArray: [],
-      hovered: false,
+      renderCard: false,
     }
   },
   methods: {
@@ -121,18 +109,19 @@ export default {
 
       this.renderer.setClearColor(0xffffff, 0);
 
-      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-      this.controls.update();
+      //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      //this.controls.update();
     },
     animate: function () {
       requestAnimationFrame(this.animate);
-      this.controls.update();
+      //this.controls.update();
       this.update();
       this.renderer.render(this.scene, this.camera);
     },
     onMouseMove: function (event) {
       this.mouse.x = ((event.clientX - this.containerRect.left) / this.container.clientWidth) * 2 - 1;
       this.mouse.y = -((event.clientY - this.containerRect.top) / this.container.clientHeight) * 2 + 1;
+
     },
     onClick: function (event) {
       console.log(event);
@@ -151,9 +140,6 @@ export default {
         if (intersects[0].object !== this.INTERSECTED) {
           if (this.INTERSECTED) {
             this.INTERSECTED.material.opacity = 0.;
-            //document.getElementById("project" + this.intersectedIndex).style.display = "none";
-            this.hoveredArray[this.intersectedIndex] = false;
-            this.hovered = false;
             this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(color0);
           }
           this.INTERSECTED = intersects[0].object;
@@ -164,23 +150,18 @@ export default {
               this.intersectedIndex = projectInd;
             }
           }
+          this.renderCard = true;
           document.body.style.cursor = 'pointer';
-          //document.getElementById("project" + this.intersectedIndex).style.display = "block";
-          this.hoveredArray[this.intersectedIndex] = true;
-          this.hovered = true;
           this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(colorHovered);
         }
       } else {
         if (this.INTERSECTED)
           this.INTERSECTED.material.opacity = 0.;
         this.INTERSECTED = null;
-        //document.getElementById("project" + this.intersectedIndex).style.display = "none";
-        this.hoveredArray[this.intersectedIndex] = false;
-        this.hovered = false;
         this.projects[this.intersectedIndex].getArchMesh().material.color.setHex(color0);
+        this.renderCard = false;
         document.body.style.cursor = 'auto';
       }
-      console.log(this.hoveredArray[0]);
     },
     drawCircles: function () {
       let geometries = [];
@@ -259,11 +240,6 @@ export default {
       this.scene.add(this.archesGroup);
       this.scene.add(this.tubesGroup);
     },
-    fillHoveredArray: function () {
-      for (let projectInd = 0; projectInd < this.projects.length; projectInd += 1) {
-        this.hoveredArray.push(true);
-      }
-    }
   },
   mounted() {
     this.init();
@@ -271,7 +247,6 @@ export default {
     window.addEventListener('click', this.onClick, false);
     this.loadWorldMap();
     this.drawArch();
-    this.fillHoveredArray();
     this.animate();
   }
 }
@@ -285,22 +260,5 @@ export default {
   width: 800px;
 }
 
-.imageContainer {
-  float: left;
-  padding: 10px;
-}
-
-.textContainer {
-  padding: 10px;
-}
-
-p {
-  text-align: justify;
-}
-
-.image {
-  width: 200px;
-  height: 200px;
-}
 
 </style>
