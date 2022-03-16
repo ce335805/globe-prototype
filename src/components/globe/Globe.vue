@@ -37,7 +37,6 @@ export default {
       archesGroup: null,
       tubesGroup: null,
       mouse: new Three.Vector2(),
-      click: new Three.Vector2(),
       INTERSECTED: null,
       intersectedIndex: 0,
       containerRect: null,
@@ -125,6 +124,9 @@ export default {
     },
     onClick: function (event) {
       console.log(event);
+      if(this.renderCard){
+        window.open(this.projects[this.intersectedIndex].url);
+      }
     },
     update: function () {
       var vector = new Three.Vector3(this.mouse.x, this.mouse.y, 1.);
