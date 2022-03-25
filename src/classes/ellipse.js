@@ -18,5 +18,4 @@ export default  class Ellipse extends Three.Curve {
             this.yRadius * Math.sin( radians ),
             0 );
     }
-
 }

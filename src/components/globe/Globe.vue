@@ -39,7 +39,6 @@ export default {
       mouse: new Three.Vector2(),
       INTERSECTED: null,
       intersectedIndex: 0,
-      containerRect: null,
       aspectAngleY: -25,
       aspectAngleX: 20,
       renderCard: false,
@@ -48,56 +47,10 @@ export default {
   methods: {
     init: function () {
       let container = document.getElementById('container');
-      this.containerRect = container.getBoundingClientRect();
       this.container = container;
       this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.005, 10);
       this.camera.position.z = 2.8;
-
       this.scene = new Three.Scene();
-
-      let geometry = new Three.SphereGeometry(1, 64, 64);
-      let material = new Three.MeshPhongMaterial({
-        color: 0x3A93C0,
-        opacity: 1.,
-        transparent: true,
-        shininess: 5.
-      });
-
-      let geometryAtmosphere = new Three.SphereGeometry(1.1, 64, 64);
-      let materialAtmosphere = new Three.ShaderMaterial({
-        vertexShader,
-        fragmentShader,
-        blending: Three.AdditiveBlending,
-        side: Three.BackSide
-      });
-      this.globe = new Three.Mesh(geometry, material);
-      let athmosphere = new Three.Mesh(geometryAtmosphere, materialAtmosphere)
-      this.scene.add(this.globe);
-      this.scene.add(athmosphere);
-
-      const ambientLight = new Three.AmbientLight(0xffffff, 0.3);
-      this.scene.add(ambientLight);
-
-      const directionalLight1 = new Three.DirectionalLight(0xffffff, 0.3);
-      directionalLight1.position.set(-1, 1, .8);
-      this.scene.add(directionalLight1);
-
-      const directionalLight2 = new Three.DirectionalLight(0xffffff, 0.3);
-      directionalLight2.position.set(-1, .5, 1.5);
-      this.scene.add(directionalLight2);
-
-      const directionalLight3 = new Three.DirectionalLight(0xffffff, 0.3);
-      directionalLight3.position.set(-1, 1.5, 1.5);
-      this.scene.add(directionalLight3);
-
-      const directionalLight5 = new Three.DirectionalLight(0xffffff, .4);
-      directionalLight5.position.set(-1, 1., -2.);
-      this.scene.add(directionalLight5);
-
-      const directionalLight6 = new Three.DirectionalLight(0xffffff, 1.25);
-      directionalLight6.position.set(-1, 0.3, -1.2);
-      this.scene.add(directionalLight6);
-
       this.renderer = new Three.WebGLRenderer({
         antialias: false,
         powerPreference: "high-performance",
@@ -105,33 +58,30 @@ export default {
       });
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(this.renderer.domElement);
-
       this.renderer.setClearColor(0xffffff, 0);
-
       //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       //this.controls.update();
     },
     animate: function () {
       requestAnimationFrame(this.animate);
       //this.controls.update();
-      this.update();
+      this.handleHover();
       this.renderer.render(this.scene, this.camera);
     },
     onMouseMove: function (event) {
-      this.mouse.x = ((event.clientX - this.containerRect.left) / this.container.clientWidth) * 2 - 1;
-      this.mouse.y = -((event.clientY - this.containerRect.top) / this.container.clientHeight) * 2 + 1;
+      this.mouse.x = ((event.clientX - this.container.getBoundingClientRect().left) / this.container.clientWidth) * 2 - 1;
+      this.mouse.y = -((event.clientY - this.container.getBoundingClientRect().top) / this.container.clientHeight) * 2 + 1;
 
     },
-    onClick: function (event) {
-      console.log(event);
+    onClick: function () {
       if(this.renderCard){
         window.open(this.projects[this.intersectedIndex].url);
       }
     },
-    update: function () {
-      var vector = new Three.Vector3(this.mouse.x, this.mouse.y, 1.);
-      vector.unproject(this.camera);
-      var ray = new Three.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
+    handleHover: function () {
+      var mousePosition3D = new Three.Vector3(this.mouse.x, this.mouse.y, 1.);
+      mousePosition3D.unproject(this.camera);
+      var ray = new Three.Raycaster(this.camera.position, mousePosition3D.sub(this.camera.position).normalize());
 
       var intersects = ray.intersectObjects(this.tubesGroup.children);
 
@@ -164,6 +114,51 @@ export default {
         this.renderCard = false;
         document.body.style.cursor = 'auto';
       }
+    },
+    addLights: function(){
+      const ambientLight = new Three.AmbientLight(0xffffff, 0.3);
+      this.scene.add(ambientLight);
+
+      const directionalLight1 = new Three.DirectionalLight(0xffffff, 0.3);
+      directionalLight1.position.set(-1, 1, .8);
+      this.scene.add(directionalLight1);
+
+      const directionalLight2 = new Three.DirectionalLight(0xffffff, 0.3);
+      directionalLight2.position.set(-1, .5, 1.5);
+      this.scene.add(directionalLight2);
+
+      const directionalLight3 = new Three.DirectionalLight(0xffffff, 0.3);
+      directionalLight3.position.set(-1, 1.5, 1.5);
+      this.scene.add(directionalLight3);
+
+      const directionalLight5 = new Three.DirectionalLight(0xffffff, .4);
+      directionalLight5.position.set(-1, 1., -2.);
+      this.scene.add(directionalLight5);
+
+      const directionalLight6 = new Three.DirectionalLight(0xffffff, 1.25);
+      directionalLight6.position.set(-1, 0.3, -1.2);
+      this.scene.add(directionalLight6);
+    },
+    addGlobeAndAthmosphere(){
+      let geometry = new Three.SphereGeometry(1, 64, 64);
+      let material = new Three.MeshPhongMaterial({
+        color: 0x3A93C0,
+        opacity: 1.,
+        transparent: true,
+        shininess: 5.
+      });
+
+      let geometryAtmosphere = new Three.SphereGeometry(1.1, 64, 64);
+      let materialAtmosphere = new Three.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        blending: Three.AdditiveBlending,
+        side: Three.BackSide
+      });
+      this.globe = new Three.Mesh(geometry, material);
+      let athmosphere = new Three.Mesh(geometryAtmosphere, materialAtmosphere)
+      this.scene.add(this.globe);
+      this.scene.add(athmosphere);
     },
     drawCircles: function () {
       let geometries = [];
@@ -247,6 +242,8 @@ export default {
     this.init();
     window.addEventListener('mousemove', this.onMouseMove, false);
     window.addEventListener('click', this.onClick, false);
+    this.addGlobeAndAthmosphere();
+    this.addLights();
     this.loadWorldMap();
     this.drawArch();
     this.animate();
