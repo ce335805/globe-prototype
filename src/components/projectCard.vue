@@ -19,7 +19,7 @@
           <div class="multiplesLeft" v-if="this.isInfoLeft">{{ this.infoLeft }}</div>
         </div>
       </div>
-      <div v-if="this.isReached"><p>We ran to this project {{ this.multiples }} times! {{ this.kmRun }}km in total!</p>
+      <div v-if="this.isReached"><p>{{ this.replacedReachedMessage }}</p>
       </div>
     </div>
   </div>
@@ -29,7 +29,7 @@
 
 export default {
   name: "projectCard",
-  props: ['kmRun', 'project'],
+  props: ['kmRun', 'project', 'reachedMessage'],
   data() {
     return {
       allCards: null,
@@ -46,6 +46,17 @@ export default {
     },
     multiples: function () {
       return Math.floor(this.kmRun / this.project.distance);
+    },
+    reachedMessageReplacements: function () {
+      return {
+        times: this.multiples.toString(),
+        kmTotal: this.kmRun.toString(),
+      };
+    },
+    replacedReachedMessage: function () {
+      return this.reachedMessage.replace(/{(\w+)}/g,
+          (placeholderWithDelimiters, placeholderWithoutDelimiters) =>
+              this.reachedMessageReplacements[placeholderWithoutDelimiters] || placeholderWithDelimiters);
     },
     isInfoRight: function () {
       return ((this.kmRun / this.project.distance) * 100) % 100 < 50;

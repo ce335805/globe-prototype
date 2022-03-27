@@ -1,6 +1,5 @@
 import * as Three from 'three'
 import {CubicBezierCurve3} from "three";
-import Ellipse from "@/classes/ellipse";
 import {DEG2RAD} from "three/src/math/MathUtils";
 
 export default class archClass {
@@ -11,10 +10,7 @@ export default class archClass {
     tubeGeometry = null;
     tubeMesh = null;
     onLandDistance = 0;
-    ellipse = null;
     isMoon = false;
-    //circleMeshA;
-    //circleMeshB;
 
     constructor(latLongStart, latLongEnd, isMoon) {
         this.isMoon = isMoon;
@@ -29,19 +25,6 @@ export default class archClass {
             this.endPoint = this.degToPointOnSpere(latLongEnd[0], latLongEnd[1]);
             this.initializeMesh();
             this.calculateOnLandDistance(this.startPoint, this.endPoint);
-            //this.makeCircleConnectingPoints(this.startPoint, this.endPoint)
-
-            //console.log(this.endPoint.x);
-            //console.log(this.endPoint.y);
-            //console.log(this.endPoint.z);
-
-            //const circleGeometry = new Three.CircleBufferGeometry(0.02, 20);
-            //const m = new Three.Matrix4();
-            //m.makeTranslation(this.endPoint.x, this.endPoint.y, this.endPoint.z);
-            //circleGeometry.applyMatrix4(m);
-            //const materialCircle = new Three.MeshBasicMaterial({color: 0xff4411});
-            //materialCircle.side = Three.DoubleSide;
-            //this.circleMeshA = new Three.Mesh(circleGeometry, materialCircle);
         }
     }
 
@@ -163,55 +146,6 @@ export default class archClass {
 
         const theta = Math.atan(pointB.y / pointB.z);
         this.onLandDistance = -theta * 6365;
-    }
-
-    makeCircleConnectingPoints(pointA, pointB){
-
-        console.log(pointA);
-        console.log(pointB);
-
-        let ellipse = new Ellipse(1.005, 1.005);
-
-        const ellipseGeometry = new Three.TubeBufferGeometry(ellipse, 50, 0.003, 4, false);
-        const ellipseMaterial = new Three.MeshBasicMaterial({color: 0xff5511});
-
-        this.ellipse = new Three.Mesh(ellipseGeometry, ellipseMaterial);
-
-        const angleY = -Math.atan(pointA.z / pointA.x) + 0.1;
-        console.log(angleY);
-        const mY = new Three.Matrix4();
-        const vecY = new Three.Vector3(0, 1, 0);
-        mY.makeRotationAxis(vecY, angleY);
-        this.curveMesh.applyMatrix4(mY);
-        //pointA.applyMatrix4(mY);
-        //pointB.applyMatrix4(mY);
-
-
-        //const angleY = Math.atan(pointB.z / pointB.x);
-        //console.log(angleY);
-        ////const angleY = 0.;
-        //const mY = new Three.Matrix4();
-        //const vecY = new Three.Vector3(0, 1, 0);
-        //mY.makeRotationAxis(vecY, angleY);
-        //this.ellipse.applyMatrix4(mY);
-
-        //const angleX = Math.atan(pointA.y / pointA.z);
-        //const mX = new Three.Matrix4();
-        //const vecX = new Three.Vector3(1, 0, 0);
-        //mX.makeRotationAxis(vecX, angleX);
-        //this.ellipse.applyMatrix4(mX);
-//
-        //const angleZ = Math.atan(pointB.x / pointB.y + 1);
-        //const mZ = new Three.Matrix4();
-        //const vecZ = new Three.Vector3(0, 0, 1);
-        //mZ.makeRotationAxis(vecZ, angleZ);
-        //this.ellipse.applyMatrix4(mZ);
-
-    }
-
-    addToScene(scene){
-        scene.add(this.curveMesh);
-        scene.add(this.tubeMesh);
     }
 
     rotateX(angleX){

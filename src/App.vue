@@ -1,6 +1,11 @@
 <template>
   <div id="app">
-    <globe v-bind:projects="this.projects" v-bind:km-run="154000"></globe>>
+    <globe v-bind:projects="this.projects"
+           v-bind:km-run="154000"
+           v-bind:container-size="'800px'"
+           v-bind:aspect-angle-x="10"
+           v-bind:aspect-angle-y="-35"
+           v-bind:reached-message="`We reached this project {times} times! We ran {kmTotal}km in total!`"></globe>>
   </div>
 </template>
 
@@ -39,7 +44,7 @@ export default {
       new projectClass([9.5 * DEG2RAD, -10. * DEG2RAD], false, 'Project6', 'This is project 6 in Sierra Leone', 'https://www.vivaconagua.org/en/', "@/assets/Moon.jpg"),
       new projectClass([17.8 * DEG2RAD, 34.9 * DEG2RAD], false, 'Project7', 'This is project 7 in Mozambique', 'https://www.vivaconagua.org/en/', "@/assets/Moon.jpg"),
       new projectClass([13.7 * DEG2RAD, 26.4 * DEG2RAD], false, 'Project8', 'This is project 8 in Zambia', 'https://www.vivaconagua.org/en/', "@/assets/Moon.jpg"),
-      new projectClass([10.6 * DEG2RAD, 38.0 * DEG2RAD], false, 'Project9', 'This is project 9 in Zambia', 'https://www.vivaconagua.org/en/', "@/assets/Moon.jpg"),
+      new projectClass([10.6 * DEG2RAD, 38.0 * DEG2RAD], false, 'Project9', 'This is project 9 in Ethiopia', 'https://www.vivaconagua.org/en/', "@/assets/Moon.jpg"),
       new projectClass([10.6 * DEG2RAD, 38.0 * DEG2RAD], true, 'The Moon', 'This is the Moon!', 'https://en.wikipedia.org/wiki/Moon', "@/assets/Moon.jpg"),
     ];
   }}

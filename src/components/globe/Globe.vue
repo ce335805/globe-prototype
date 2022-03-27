@@ -1,7 +1,10 @@
 <template>
   <div>
     <div id="container"></div>
-    <project-card v-if="renderCard" v-bind:km-run="kmRun" v-bind:project="projects[intersectedIndex]">
+    <project-card v-if="renderCard"
+                  v-bind:km-run="kmRun"
+                  v-bind:project="projects[intersectedIndex]"
+                  v-bind:reached-message="this.reachedMessage">
     </project-card>
   </div>
 </template>
@@ -9,7 +12,6 @@
 <script>
 import * as Three from 'three'
 import {DEG2RAD} from "three/src/math/MathUtils";
-//import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
 import ProjectCard from "@/components/projectCard";
 //import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
@@ -20,7 +22,7 @@ import fragmentShader from 'raw-loader!glslify-loader!../../assets/shaders/fragm
 export default {
   name: 'globe',
   components: {ProjectCard},
-  props: ['projects', 'kmRun'],
+  props: ['projects', 'kmRun', 'containerSize', 'aspectAngleX', 'aspectAngleY', 'reachedMessage'],
   data() {
     return {
       container: null,
@@ -28,8 +30,6 @@ export default {
       scene: null,
       renderer: null,
       globe: null,
-      rows: 160,
-      dotDensity: 80,
       imgData: null,
       imgWidth: 0,
       imgHeight: 0,
@@ -39,16 +39,15 @@ export default {
       mouse: new Three.Vector2(),
       INTERSECTED: null,
       intersectedIndex: 0,
-      aspectAngleY: -25,
-      aspectAngleX: 20,
       renderCard: false,
     }
   },
   methods: {
     init: function () {
-      let container = document.getElementById('container');
-      this.container = container;
-      this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.005, 10);
+      this.container = document.getElementById('container');
+      this.container.style.width = this.containerSize;
+      this.container.style.height = this.containerSize;
+      this.camera = new Three.PerspectiveCamera(70, this.container.clientWidth / this.container.clientHeight, 0.005, 10);
       this.camera.position.z = 2.8;
       this.scene = new Three.Scene();
       this.renderer = new Three.WebGLRenderer({
@@ -56,8 +55,8 @@ export default {
         powerPreference: "high-performance",
         alpha: true
       });
-      this.renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(this.renderer.domElement);
+      this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+      this.container.appendChild(this.renderer.domElement);
       this.renderer.setClearColor(0xffffff, 0);
       //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       //this.controls.update();
@@ -71,7 +70,6 @@ export default {
     onMouseMove: function (event) {
       this.mouse.x = ((event.clientX - this.container.getBoundingClientRect().left) / this.container.clientWidth) * 2 - 1;
       this.mouse.y = -((event.clientY - this.container.getBoundingClientRect().top) / this.container.clientHeight) * 2 + 1;
-
     },
     onClick: function () {
       if(this.renderCard){
@@ -160,15 +158,17 @@ export default {
       this.scene.add(this.globe);
       this.scene.add(athmosphere);
     },
-    drawCircles: function () {
+    drawLandmassOnGlobe: function () {
       let geometries = [];
-      for (let lat = -90; lat <= 90; lat += 180 / this.rows) {
+      const rows = 160;
+      const dotDensity = 80;
+      for (let lat = -90; lat <= 90; lat += 180 / rows) {
         const radius = Math.cos(Math.abs(lat) * DEG2RAD);
         const circumference = radius * Math.PI * 2;
-        const dotsForLat = Math.floor(circumference * this.dotDensity);
+        const dotsForLat = Math.floor(circumference * dotDensity);
         for (let x = 0; x < dotsForLat; x += 1) {
           const long = x * 360. / dotsForLat;
-          if (!this.visibilityForCoordinate(long, lat)) {
+          if (!this.isLandPixelVisible(long, lat)) {
             continue;
           }
           let geometryCircle = new Three.CircleBufferGeometry(0.005, 5);
@@ -205,7 +205,7 @@ export default {
         vm.imgData = ctx.getImageData(0, 0, img.width, img.height);
         vm.imgWidth = img.width;
         vm.imgHeight = img.height;
-        vm.drawCircles();
+        vm.drawLandmassOnGlobe();
         //rotate globe to nice position
         const m = new Three.Matrix4();
         const vecY = new Three.Vector3(0, 1, 0);
@@ -218,12 +218,12 @@ export default {
       img.src = require("../../assets/worldmap2.png");
 
     },
-    visibilityForCoordinate: function (long, lat) {
+    isLandPixelVisible: function (long, lat) {
       const pixelRow = Math.floor(this.imgHeight / 180 * (-lat + 90));
       const pixelColumn = Math.floor(this.imgWidth / 360 * ((long + 180) % 360));
       return this.imgData.data[pixelRow * this.imgWidth * 4 + pixelColumn * 4 + 3] > 120;
     },
-    drawArch: function () {
+    addArchesToScene: function () {
       this.archesGroup = new Three.Group();
       this.tubesGroup = new Three.Group();
       this.archesGroup.renderOrder = 0;
@@ -245,7 +245,7 @@ export default {
     this.addGlobeAndAthmosphere();
     this.addLights();
     this.loadWorldMap();
-    this.drawArch();
+    this.addArchesToScene();
     this.animate();
   }
 }
