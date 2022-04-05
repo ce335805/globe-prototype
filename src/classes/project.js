@@ -1,17 +1,20 @@
-import archClass from "@/classes/arch";
+import archClass from "./arch";
 
 export default class projectClass {
-    hamburgCoords = [0.915, 0.1740];
-    coordinates = [0., 0.];
-    isMoon = false;
-    arch = null;
-    title = '';
-    description = '';
-    imgUrl = '';
-    url = '';
-    distance = 0;
+    //hamburgCoords = [0.915, 0.1740];
+    //coordinates = [0., 0.];
+    //isMoon = false;
+    //arch = null;
+    //title = '';
+    //description = '';
+    //imgUrl = '';
+    //url = '';
+    //distance = 0;
 
     constructor(coordinates, isMoon, title, description, url, imgUrl) {
+
+        this.hamburgCoords = [0.915, 0.1740];
+
         this.isMoon = isMoon;
         this.coordinates = coordinates;
         this.arch = new archClass(this.hamburgCoords, this.coordinates, isMoon);

@@ -1,10 +1,11 @@
 {
   "name": "globe-prototype",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.6",
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build-lib": "vue-cli-service build --target lib --name globe-lib src/main.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -44,5 +45,6 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "main": "./dist/globe-lib.common.js"
 }

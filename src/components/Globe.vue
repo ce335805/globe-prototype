@@ -13,11 +13,11 @@
 import * as Three from 'three'
 import {DEG2RAD} from "three/src/math/MathUtils";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
-import ProjectCard from "@/components/projectCard";
+import ProjectCard from "./projectCard";
 //import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 
-import vertexShader from 'raw-loader!glslify-loader!../../assets/shaders/vertex.glsl'
-import fragmentShader from 'raw-loader!glslify-loader!../../assets/shaders/fragment.glsl'
+import vertexShader from 'raw-loader!glslify-loader!../assets/shaders/vertex.glsl'
+import fragmentShader from 'raw-loader!glslify-loader!../assets/shaders/fragment.glsl'
 
 export default {
   name: 'globe',
@@ -215,7 +215,7 @@ export default {
         m.makeRotationAxis(vecX, vm.aspectAngleX * DEG2RAD);
         vm.landMesh.applyMatrix4(m);
       };
-      img.src = require("../../assets/worldmap2.png");
+      img.src = require("../assets/worldmap2.png");
 
     },
     isLandPixelVisible: function (long, lat) {

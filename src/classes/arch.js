@@ -3,14 +3,14 @@ import {CubicBezierCurve3} from "three";
 import {DEG2RAD} from "three/src/math/MathUtils";
 
 export default class archClass {
-    startPoint = null;
-    endPoint = null;
-    curveGeometry = null;
-    curveMesh = null;
-    tubeGeometry = null;
-    tubeMesh = null;
-    onLandDistance = 0;
-    isMoon = false;
+    //startPoint = null;
+    //endPoint = null;
+    //curveGeometry = null;
+    //curveMesh = null;
+    //tubeGeometry = null;
+    //tubeMesh = null;
+    //onLandDistance = 0;
+    //isMoon = false;
 
     constructor(latLongStart, latLongEnd, isMoon) {
         this.isMoon = isMoon;

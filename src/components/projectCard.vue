@@ -1,9 +1,9 @@
 <template>
-  <div class="projectCard" v-bind:class="{show: this.showCard, hide: !this.showCard}">
+  <div class="projectCard" id="projectCard" v-bind:class="{show: this.showCard, hide: !this.showCard}">
 
     <div>
       <div class="imageContainer">
-        <img class="image" src="./../assets/Moon.jpg" alt="A picture of the moon.">
+        <img class="image" v-bind:src="this.project.imgUrl" alt="A project specific picture.">
       </div>
       <div class="textContainer">
         <h3>{{ project.title }}</h3>
@@ -32,7 +32,7 @@ export default {
   props: ['kmRun', 'project', 'reachedMessage'],
   data() {
     return {
-      allCards: null,
+      card: null,
       showCard: false,
     }
   },
@@ -82,13 +82,14 @@ export default {
   methods: {
     onMouseMove: function (event) {
       this.showCard = true;
-      this.allCards[0].style.left = event.clientX + 20 + 'px';
-      this.allCards[0].style.top = event.clientY + 20 + 'px';
+      this.card.style.left = event.clientX + 20 + 'px';
+      this.card.style.top = event.clientY + 20 + 'px';
     },
   },
   mounted() {
-    this.allCards = document.getElementsByClassName('projectCard');
+    this.card = document.getElementById('projectCard');
     window.addEventListener('mousemove', this.onMouseMove, false);
+    console.log(this.project.imgUrl)
   }
 }
 </script>
