@@ -11,7 +11,7 @@ export default class projectClass {
     //url = '';
     //distance = 0;
 
-    constructor(coordinates, isMoon, title, description, url, imgUrl) {
+    constructor(coordinates, isMoon, title, description, url, imgName) {
 
         this.hamburgCoords = [0.915, 0.1740];
 
@@ -22,7 +22,7 @@ export default class projectClass {
         this.title = title;
         this.description = description;
         this.url = url;
-        this.imgUrl = imgUrl;
+        this.imgName = imgName;
     }
 
     getArchMesh(){

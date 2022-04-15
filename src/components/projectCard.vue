@@ -39,8 +39,7 @@ export default {
   computed: {
     getImgUrl() {
       try {
-        //console.log(require("@/assets/" + this.project.imgUrl));
-        return require("@/assets/" + this.project.imgUrl);
+        return require("@/assets/" + this.project.imgName);
       } catch(error) {
         console.log("Error when loading project image!");
         return '';
