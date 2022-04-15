@@ -3,7 +3,7 @@
 
     <div>
       <div class="imageContainer">
-        <img class="image" v-bind:src="this.project.imgUrl" alt="A project specific picture.">
+        <img class="image" v-bind:src="this.getImgUrl" alt="A project specific picture.">
       </div>
       <div class="textContainer">
         <h3>{{ project.title }}</h3>
@@ -37,6 +37,15 @@ export default {
     }
   },
   computed: {
+    getImgUrl() {
+      try {
+        //console.log(require("@/assets/" + this.project.imgUrl));
+        return require("@/assets/" + this.project.imgUrl);
+      } catch(error) {
+        console.log("Error when loading project image!");
+        return '';
+      }
+    },
     progressFractionModulo: function () {
       const progressNumeric = ((this.kmRun / this.project.distance) * 100) % 100;
       return progressNumeric.toString() + "%";
@@ -89,7 +98,6 @@ export default {
   mounted() {
     this.card = document.getElementById('projectCard');
     window.addEventListener('mousemove', this.onMouseMove, false);
-    console.log(this.project.imgUrl)
   }
 }
 </script>
